@@ -136,12 +136,42 @@ export const ETH2X_FLI = new Token(
   'ETH2x-FLI',
   'ETH 2x Flexible Leverage Index'
 )
+
+export const MATTER: { [chainId: number]: Token } = {
+  [SupportedChainId.GOERLI]: new Token(
+    SupportedChainId.GOERLI,
+    '0x5A0C6015411BdB4D632e1283b15FA28E473Dd47A',
+    0,
+    'MATTER',
+    'matter'
+  ),
+}
+
+export const O: { [chainId: number]: Token } = {
+  [SupportedChainId.GOERLI]: new Token(
+    SupportedChainId.GOERLI,
+    '0x91FD9fc6C0E4b33F9877dE658f99CE99EDbE5C52',
+    0,
+    'O',
+    'Oxygen'
+  ),
+}
+
+export const H: { [chainId: number]: Token } = {
+  [SupportedChainId.GOERLI]: new Token(
+    SupportedChainId.GOERLI,
+    '0xAaaEF4D8Bd031D80BCf715d26869427167137837',
+    0,
+    'H',
+    'Hydrogen'
+  ),
+}
+
 export const UNI: { [chainId: number]: Token } = {
   [SupportedChainId.MAINNET]: new Token(SupportedChainId.MAINNET, UNI_ADDRESS[1], 18, 'UNI', 'Uniswap'),
   [SupportedChainId.RINKEBY]: new Token(SupportedChainId.RINKEBY, UNI_ADDRESS[4], 18, 'UNI', 'Uniswap'),
   [SupportedChainId.ROPSTEN]: new Token(SupportedChainId.ROPSTEN, UNI_ADDRESS[3], 18, 'UNI', 'Uniswap'),
   [SupportedChainId.GOERLI]: new Token(SupportedChainId.GOERLI, UNI_ADDRESS[5], 18, 'UNI', 'Uniswap'),
-  [SupportedChainId.KOVAN]: new Token(SupportedChainId.KOVAN, UNI_ADDRESS[42], 18, 'UNI', 'Uniswap'),
 }
 
 export const WETH9_EXTENDED: { [chainId: number]: Token } = {

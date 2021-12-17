@@ -39,30 +39,6 @@ export const ArrowWrapper = styled.div<{ clickable: boolean }>`
       : null}
 `
 
-export const PlusWrapper = styled.div<{ clickable: boolean }>`
-  padding: 4px;
-  border-radius: 12px;
-  height: 32px;
-  width: 32px;
-  position: relative;
-  margin-top: -14px;
-  margin-bottom: -14px;
-  left: calc(50% - 16px);
-  /* transform: rotate(90deg); */
-  background-color: ${({ theme }) => theme.bg1};
-  border: 4px solid ${({ theme }) => theme.bg0};
-  z-index: 2;
-  ${({ clickable }) =>
-    clickable
-      ? css`
-          :hover {
-            cursor: pointer;
-            opacity: 0.8;
-          }
-        `
-      : null}
-`
-
 export const SectionBreak = styled.div`
   height: 1px;
   width: 100%;

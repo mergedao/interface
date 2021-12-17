@@ -38,7 +38,6 @@ const HeaderFrame = styled.div<{ showBackground: boolean }>`
   position: relative;
   padding: 1rem;
   z-index: 21;
-  position: relative;
   /* Background slide effect on scroll. */
   background-image: ${({ theme }) => `linear-gradient(to bottom, transparent 50%, ${theme.bg0} 50% )}}`};
   background-position: ${({ showBackground }) => (showBackground ? '0 -100%' : '0 0')};
@@ -276,6 +275,9 @@ export default function Header() {
       <HeaderLinks>
         <StyledNavLink id={`swap-nav-link`} to={'/swap'}>
           <Trans>Swap</Trans>
+        </StyledNavLink>
+        <StyledNavLink id={`swap-nav-link`} to={'/merge'}>
+          <Trans>Merge</Trans>
         </StyledNavLink>
         <StyledNavLink
           id={`pool-nav-link`}

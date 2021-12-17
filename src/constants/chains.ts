@@ -12,6 +12,9 @@ export enum SupportedChainId {
   GOERLI = 5,
   KOVAN = 42,
 
+  BSCTEST = 97,
+  BSCMAIN = 56,
+
   ARBITRUM_ONE = 42161,
   ARBITRUM_RINKEBY = 421611,
   OPTIMISM = 10,
@@ -25,6 +28,9 @@ export const ALL_SUPPORTED_CHAIN_IDS: SupportedChainId[] = [
   SupportedChainId.GOERLI,
   SupportedChainId.KOVAN,
 
+  SupportedChainId.BSCMAIN,
+  SupportedChainId.BSCTEST,
+
   SupportedChainId.ARBITRUM_ONE,
   SupportedChainId.ARBITRUM_RINKEBY,
   SupportedChainId.OPTIMISM,
@@ -37,6 +43,9 @@ export const L1_CHAIN_IDS = [
   SupportedChainId.RINKEBY,
   SupportedChainId.GOERLI,
   SupportedChainId.KOVAN,
+
+  SupportedChainId.BSCMAIN,
+  SupportedChainId.BSCTEST,
 ] as const
 
 export type SupportedL1ChainId = typeof L1_CHAIN_IDS[number]
@@ -160,6 +169,22 @@ export const CHAIN_INFO: ChainInfo = {
     rpcUrls: ['https://kovan.optimism.io'],
     logoUrl: optimismLogoUrl,
     nativeCurrency: { name: 'Optimistic kovETH', symbol: 'kovOpETH', decimals: 18 },
+  },
+
+  [SupportedChainId.BSCMAIN]: {
+    docs: 'https://docs.uniswap.org/',
+    explorer: 'https://goerli.etherscan.io/',
+    infoLink: 'https://info.uniswap.org/#/',
+    label: 'Görli',
+    nativeCurrency: { name: 'Görli ETH', symbol: 'BNB', decimals: 18 },
+  },
+
+  [SupportedChainId.BSCTEST]: {
+    docs: 'https://docs.uniswap.org/',
+    explorer: 'https://goerli.etherscan.io/',
+    infoLink: 'https://info.uniswap.org/#/',
+    label: 'Görli',
+    nativeCurrency: { name: 'Görli ETH', symbol: 'tBNB', decimals: 18 },
   },
 }
 
