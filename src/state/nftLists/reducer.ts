@@ -4,7 +4,7 @@ import { getVersionUpgrade, TokenList, VersionUpgrade } from '@uniswap/token-lis
 import { DEFAULT_ACTIVE_LIST_URLS } from '../../constants/lists'
 import { DEFAULT_LIST_OF_LISTS } from '../../constants/lists'
 import { updateVersion } from '../global/actions'
-import { acceptListUpdate, addList, disableList, enableList, fetchTokenList, removeList } from './actions'
+import { acceptListUpdate, addList, disableList, enableList, fetchNFTokenList, removeList } from './actions'
 
 export interface ListsState {
   readonly byUrl: {
@@ -46,7 +46,7 @@ const initialState: ListsState = {
 
 export default createReducer(initialState, (builder) =>
   builder
-    .addCase(fetchTokenList.pending, (state, { payload: { requestId, url } }) => {
+    .addCase(fetchNFTokenList.pending, (state, { payload: { requestId, url } }) => {
       const current = state.byUrl[url]?.current ?? null
       const pendingUpdate = state.byUrl[url]?.pendingUpdate ?? null
 
@@ -57,7 +57,7 @@ export default createReducer(initialState, (builder) =>
         error: null,
       }
     })
-    .addCase(fetchTokenList.fulfilled, (state, { payload: { requestId, tokenList, url } }) => {
+    .addCase(fetchNFTokenList.fulfilled, (state, { payload: { requestId, tokenList, url } }) => {
       const current = state.byUrl[url]?.current
       const loadingRequestId = state.byUrl[url]?.loadingRequestId
 
@@ -88,7 +88,7 @@ export default createReducer(initialState, (builder) =>
         }
       }
     })
-    .addCase(fetchTokenList.rejected, (state, { payload: { url, requestId, errorMessage } }) => {
+    .addCase(fetchNFTokenList.rejected, (state, { payload: { url, requestId, errorMessage } }) => {
       if (state.byUrl[url]?.loadingRequestId !== requestId) {
         // no-op since it's not the latest request
         return

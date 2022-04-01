@@ -1,28 +1,19 @@
-import { Trans } from '@lingui/macro'
 import { Currency, CurrencyAmount, Percent, Token } from '@uniswap/sdk-core'
 import { Pair } from '@uniswap/v2-sdk'
 // import { AutoColumn } from 'components/Column'
-// import {
-//   LoadingOpacityContainer,
-//   // loadingOpacityMixin
-// } from 'components/Loader/styled'
 import { darken, transparentize } from 'polished'
-import { ReactNode, useCallback, useMemo, useState } from 'react'
+import { ReactNode, useCallback, useState } from 'react'
+import { CheckCircle } from 'react-feather'
 import { NFToken } from 'state/merge/reducer'
-// import { Lock } from 'react-feather'
 import styled from 'styled-components/macro'
 
-import darkEmptyImg from '../../assets/images/default_pic_dark.png'
-import emptyImg from '../../assets/images/default_pic_dark.png'
-// import { formatCurrencyAmount } from 'utils/formatCurrencyAmount'
 import { ReactComponent as DropDown } from '../../assets/images/dropdown.svg'
 import useTheme from '../../hooks/useTheme'
 import { useActiveWeb3React } from '../../hooks/web3'
 import { useCurrencyBalance } from '../../state/wallet/hooks'
 import { ButtonGray } from '../Button'
-import CurrencyLogo from '../CurrencyLogo'
+import { AutoRow } from '../Row'
 // import { Input as NumericalInput } from '../NumericalInput'
-import { RowFixed } from '../Row'
 // import CurrencySearchModal from '../SearchModal/CurrencySearchModal'
 
 const SelectPanel = styled.div<{ hideInput?: boolean }>`
@@ -32,7 +23,6 @@ const SelectPanel = styled.div<{ hideInput?: boolean }>`
   background-color: ${({ theme, hideInput }) => (hideInput ? 'transparent' : theme.bg2)};
   z-index: 1;
   width: ${({ hideInput }) => (hideInput ? '100%' : 'initial')};
-  height: 100%;
 `
 
 const FixedContainer = styled.div<{ top?: string }>`
@@ -52,13 +42,13 @@ const FixedContainer = styled.div<{ top?: string }>`
 const NFTFixedContainer = styled.div<{ top?: string }>`
   width: 100%;
   height: auto;
-  position: absolute;
+  // position: absolute;
   border-radius: 20px;
   // background-color: ${({ theme }) => theme.bg1};
   opacity: 0.95;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-wrap: wrap;
+  justify-content: space-around;
   z-index: 2;
   top: ${({ top }) => top || '0'};
 `
@@ -66,9 +56,18 @@ const NFTFixedContainer = styled.div<{ top?: string }>`
 const Container = styled.div<{ hideInput: boolean }>`
   border-radius: ${({ hideInput }) => (hideInput ? '16px' : '20px')};
   border: 1px solid ${({ theme, hideInput }) => (hideInput ? ' transparent' : theme.bg2)};
-  background-color: ${({ theme }) => theme.bg2};
+  background-color: ${({ theme }) => theme.bg1};
   width: ${({ hideInput }) => (hideInput ? '100%' : 'initial')};
-  height: ${({ hideInput }) => (hideInput ? '100%' : 'initial')};
+  // display: flex;
+  // flex-wrap: wrap;
+  // justify-content: space-around;
+  min-width: 200px;
+  max-width: 240px;
+  height: 360px;
+  overflow: hidden;
+  margin: 1rem;
+  position: relative;
+  box-shadow: 0px 8px 20px ${({ theme }) => theme.text4};
   :focus,
   :hover {
     border: 1px solid ${({ theme, hideInput }) => (hideInput ? ' transparent' : theme.bg3)};
@@ -78,11 +77,11 @@ const Container = styled.div<{ hideInput: boolean }>`
 const CurrencySelect = styled(ButtonGray)<{ visible: boolean; selected: boolean; hideInput?: boolean }>`
   visibility: ${({ visible }) => (visible ? 'visible' : 'hidden')};
   align-items: center;
-  font-size: 12px;
-  font-weight: 200;
-  background-color: ${({ selected, theme }) => transparentize(0.3, selected ? theme.bg2 : theme.primary1)};
+  font-size: 24px;
+  font-weight: 500;
+  background-color: ${({ selected, theme }) => (selected ? theme.bg0 : theme.primary1)};
   color: ${({ selected, theme }) => (selected ? theme.text1 : theme.white)};
-  border-radius: 1rem 1rem 0 0;
+  border-radius: 16px;
   box-shadow: ${({ selected }) => (selected ? 'none' : '0px 6px 10px rgba(0, 0, 0, 0.075)')};
   box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.075);
   outline: none;
@@ -96,8 +95,7 @@ const CurrencySelect = styled(ButtonGray)<{ visible: boolean; selected: boolean;
   margin-right: ${({ hideInput }) => (hideInput ? '0' : '12px')};
   :focus,
   :hover {
-    background-color: ${({ selected, theme }) => transparentize(0.3, selected ? theme.bg2 : theme.primary1)};
-    // background-color: ${({ selected, theme }) => (selected ? theme.bg2 : theme.primary1)};
+    background-color: ${({ selected, theme }) => (selected ? theme.bg2 : darken(0.05, theme.primary1))};
   }
 `
 
@@ -105,23 +103,27 @@ const SelectRow = styled.div<{ selected: boolean }>`
   ${({ theme }) => theme.flexRowNoWrap}
   align-items: start;
   justify-content: center;
+  height: 356px;
+  overflow: hidden;
   padding: ${({ selected }) => (selected ? ' 1rem 1rem 0.75rem 1rem' : '1rem 1rem 0.75rem 1rem')};
 `
 
 const StyledNFTImage = styled.img<{ height: string; width: string }>`
   width: ${({ height }) => height};
   height: ${({ width }) => width};
-  // background-color: ${({ theme }) => theme.bg2};
-  box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.075);
-  border-radius: 24px;
+  border-radius: 10px;
 `
 
-const NFTView = styled(StyledNFTImage)<{ isEmpty: boolean }>`
+const NFTView = styled(StyledNFTImage)`
   ${({ theme }) => theme.flexRowNoWrap}
   align-items: center;
   justify-content: center;
-  padding: 0.4rem;
-  object-fit: ${({ isEmpty }) => (isEmpty ? 'contain' : 'cover')};
+  // margin: 1rem;
+  min-width: 100px;
+  min-height: 200px;
+  object-fit: cover;
+  // padding: 1rem 1rem 0.75rem 1rem;
+  width: 100%;
 `
 
 const LabelRow = styled.div`
@@ -185,6 +187,29 @@ const StyledBalanceMax = styled.button<{ disabled?: boolean }>`
   `};
 `
 
+const StyledMask = styled.div<{ Yin?: boolean; visible?: boolean }>`
+  background-color: ${({ Yin, theme }) => transparentize(0.3, theme.text1)};
+  color: ${({ theme }) => theme.primary1};
+  font-size: 1rem;
+  font-weight: bold;
+  opacity: 1;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: ${({ visible }) => (visible ? 'initial' : 'none')};
+`
+
+const StyledMaskWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  justify-content: center;
+  // align-items: center;
+`
+
 // const StyledNumericalInput = styled(NumericalInput)<{ $loading: boolean }>`
 //   ${loadingOpacityMixin}
 // `
@@ -196,13 +221,18 @@ interface CurrencyInputPanelProps {
   showMaxButton: boolean
   label?: ReactNode
   onCurrencySelect?: (currency: Currency) => void
+  onNFTSelect?: (nft: NFToken) => void
   currency?: Currency | null
-  nft?: NFToken | null
+  yin?: {
+    tokenId: string | undefined | null
+  } | null
+  yang?: {
+    tokenId: string | undefined | null
+  } | null
   hideBalance?: boolean
   pair?: Pair | null
   hideInput?: boolean
   otherCurrency?: Currency | null
-  otherNft?: NFToken | null
   fiatValue?: CurrencyAmount<Token> | null
   priceImpact?: Percent
   id: string
@@ -215,17 +245,16 @@ interface CurrencyInputPanelProps {
   tokenList?: NFToken[]
 }
 
-export default function NFTSelectPanel({
+export default function NFTListPanel({
   value,
   onUserInput,
   onMax,
   showMaxButton,
   onCurrencySelect,
+  onNFTSelect,
   currency,
-  nft,
   tokenList,
   otherCurrency,
-  otherNft,
   id,
   showCommonBases,
   showCurrencyAmount,
@@ -233,9 +262,11 @@ export default function NFTSelectPanel({
   renderBalance,
   fiatValue,
   priceImpact,
-  hideBalance = false,
+  yin,
+  yang,
+  hideBalance = true,
   // pair = null, // used for double token logo
-  hideInput = false,
+  hideInput = true,
   // locked = true,
   loading = false,
   ...rest
@@ -245,68 +276,68 @@ export default function NFTSelectPanel({
   const selectedCurrencyBalance = useCurrencyBalance(account ?? undefined, currency ?? undefined)
   const theme = useTheme()
 
-  const emptyUrl = useMemo(() => {
-    return theme.darkMode ? darkEmptyImg : emptyImg
-  }, [theme])
-
-  const tokenId = useMemo(() => {
-    return nft?.tokenId ?? ''
-  }, [nft])
-
   const handleDismissSearch = useCallback(() => {
     setModalOpen(false)
   }, [setModalOpen])
 
+  const handleNFTSelect = useCallback(
+    (token: NFToken) => {
+      if (!token) {
+        return
+      }
+      alert(`You have selected ${token.tokenId} from ${token.tokenName}`)
+      console.log('current nft Select:', token)
+      onNFTSelect && onNFTSelect(token)
+    },
+    [onNFTSelect]
+  )
+
   return (
     <SelectPanel id={id} hideInput={hideInput} {...rest}>
-      {/* {locked && (
-        <FixedContainer>
-          <AutoColumn gap="sm" justify="center">
-            <Lock />
-            <TYPE.label fontSize="12px" textAlign="center" padding="0 12px">
-              <Trans>The market price is outside your specified price range. Single-asset deposit only.</Trans>
-            </TYPE.label>
-          </AutoColumn>
-        </FixedContainer>
-      )} */}
       <NFTFixedContainer>
-        <Container hideInput={hideInput} style={{ background: 'transparent' }}>
-          <SelectRow style={hideInput ? { padding: '0.4rem', borderRadius: '10px' } : {}} selected={true}>
-            <CurrencySelect
-              visible={true}
-              selected={true}
-              hideInput={hideInput}
-              className="open-currency-select-button"
-              onClick={() => {
-                // if (onCurrencySelect) {
-                //   setModalOpen(true)
-                // }
-              }}
-            >
-              <Aligner>
-                <RowFixed title={`#${tokenId}`}>
-                  {currency ? (
-                    <CurrencyLogo style={{ marginRight: '0.5rem' }} currency={currency} size={'24px'} />
-                  ) : null}
-                  <StyledTokenName className="token-symbol-container" active={true}>
-                    #
-                    {(tokenId.length > 20
-                      ? tokenId.slice(0, 4) + '...' + tokenId.slice(tokenId.length - 5, tokenId.length)
-                      : tokenId) || <Trans>Empty</Trans>}
-                  </StyledTokenName>
-                </RowFixed>
-              </Aligner>
-            </CurrencySelect>
-          </SelectRow>
-        </Container>
-      </NFTFixedContainer>
-      <Container hideInput={hideInput}>
-        {/* {tokenList &&
+        {tokenList &&
           tokenList.map((token) => {
-            return <NFTView key={token.tokenId} width="100%" height="100%" src={token.tokenURI}></NFTView>
-          })} */}
-        <NFTView isEmpty={!nft?.tokenURI} width="100%" height="100%" src={nft?.tokenURI || emptyUrl}></NFTView>
-      </Container>
+            return (
+              <Container
+                onClick={() => {
+                  handleNFTSelect(token)
+                }}
+                key={token.tokenId}
+                hideInput={hideInput}
+              >
+                <SelectRow style={{ borderRadius: '8px' }} selected={!onCurrencySelect}>
+                  <NFTView width="100%" height="auto" src={token.tokenURI}></NFTView>
+                </SelectRow>
+                <StyledMask
+                  Yin={token.tokenId === yin?.tokenId}
+                  visible={token.tokenId === yin?.tokenId || token.tokenId === yang?.tokenId}
+                >
+                  <StyledMaskWrapper>
+                    <AutoRow justify="center" padding="0.5rem">
+                      <CheckCircle size="2rem" />
+                    </AutoRow>
+                    <AutoRow justify="center">
+                      {token.tokenId === yin?.tokenId && <div>Yin</div>}
+                      {token.tokenId === yang?.tokenId && <div>Yang</div>}
+                    </AutoRow>
+                  </StyledMaskWrapper>
+                </StyledMask>
+              </Container>
+            )
+          })}
+      </NFTFixedContainer>
+      {/* {onCurrencySelect && (
+        <NFCurrencySearchModal
+          isOpen={modalOpen}
+          onDismiss={handleDismissSearch}
+          onCurrencySelect={onCurrencySelect}
+          selectedCurrency={currency}
+          otherSelectedCurrency={otherCurrency}
+          showCommonBases={showCommonBases}
+          showCurrencyAmount={showCurrencyAmount}
+          disableNonToken={disableNonToken}
+        />
+      )} */}
     </SelectPanel>
   )
 }

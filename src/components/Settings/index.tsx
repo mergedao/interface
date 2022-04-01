@@ -4,7 +4,7 @@ import { Percent } from '@uniswap/sdk-core'
 import { SupportedChainId } from 'constants/chains'
 import { useActiveWeb3React } from 'hooks/web3'
 import { useContext, useRef, useState } from 'react'
-import { Settings, X } from 'react-feather'
+import { RotateCw, X } from 'react-feather'
 import ReactGA from 'react-ga'
 import { Text } from 'rebass'
 import styled, { ThemeContext } from 'styled-components/macro'
@@ -22,7 +22,7 @@ import { RowBetween, RowFixed } from '../Row'
 import Toggle from '../Toggle'
 import TransactionSettings from '../TransactionSettings'
 
-const StyledMenuIcon = styled(Settings)`
+const StyledMenuIcon = styled(RotateCw)`
   height: 20px;
   width: 20px;
 

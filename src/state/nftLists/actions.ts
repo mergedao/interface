@@ -1,14 +1,14 @@
 import { ActionCreatorWithPayload, createAction } from '@reduxjs/toolkit'
 import { TokenList } from '@uniswap/token-lists'
 
-export const fetchTokenList: Readonly<{
+export const fetchNFTokenList: Readonly<{
   pending: ActionCreatorWithPayload<{ url: string; requestId: string }>
   fulfilled: ActionCreatorWithPayload<{ url: string; tokenList: TokenList; requestId: string }>
   rejected: ActionCreatorWithPayload<{ url: string; errorMessage: string; requestId: string }>
 }> = {
-  pending: createAction('lists/fetchTokenList/pending'),
-  fulfilled: createAction('lists/fetchTokenList/fulfilled'),
-  rejected: createAction('lists/fetchTokenList/rejected'),
+  pending: createAction('lists/fetchNFTokenList/pending'),
+  fulfilled: createAction('lists/fetchNFTokenList/fulfilled'),
+  rejected: createAction('lists/fetchNFTokenList/rejected'),
 }
 
 // add and remove from list options

@@ -6,6 +6,7 @@ import { Trade as V3Trade } from '@uniswap/v3-sdk'
 import { TWO_PERCENT } from 'constants/misc'
 import { useBestV2Trade } from 'hooks/useBestV2Trade'
 import { useBestV3Trade } from 'hooks/useBestV3Trade'
+import { useFetchNFTListCallback } from 'hooks/useFetchListCallback'
 import JSBI from 'jsbi'
 import { ParsedQs } from 'qs'
 import { ReactNode, useCallback, useEffect, useMemo, useState } from 'react'
@@ -13,6 +14,7 @@ import { useAppDispatch, useAppSelector } from 'state/hooks'
 import { V3TradeState } from 'state/routing/types'
 import { isTradeBetter } from 'utils/isTradeBetter'
 
+import { assets } from '../../constants/opensea'
 import { useCurrency } from '../../hooks/NFTokens'
 import useENS from '../../hooks/useENS'
 import useParsedQueryString from '../../hooks/useParsedQueryString'
@@ -22,8 +24,16 @@ import { useActiveWeb3React } from '../../hooks/web3'
 import { isAddress } from '../../utils'
 import { AppState } from '../index'
 import { useCurrencyBalances } from '../wallet/hooks'
-import { Field, replaceSwapState, selectCurrency, setRecipient, switchCurrencies, typeInput } from './actions'
-import { MergeSwapState } from './reducer'
+import {
+  Field,
+  replaceSwapState,
+  selectCurrency,
+  selectNFT,
+  setRecipient,
+  switchCurrencies,
+  typeInput,
+} from './actions'
+import { MergeSwapState, NFToken } from './reducer'
 
 export function useMergeSwapState(): AppState['mergeSwap'] {
   return useAppSelector((state) => state.mergeSwap)
@@ -31,22 +41,66 @@ export function useMergeSwapState(): AppState['mergeSwap'] {
 
 export function useSwapActionHandlers(): {
   onCurrencySelection: (field: Field.INPUT | Field.OUTPUT, currency: Currency) => void
+  onNFTSelection: (field: Field.YIN_NFT | Field.YANG_NFT, token: NFToken) => void
   onSwitchTokens: () => void
   onUserInput: (field: Field.INPUT | Field.OUTPUT, typedValue: string) => void
   onChangeRecipient: (recipient: string | null) => void
 } {
   const dispatch = useAppDispatch()
+  const fetchNFT = useFetchNFTListCallback()
+  const { account } = useActiveWeb3React()
+
   const onCurrencySelection = useCallback(
     (field: Field.INPUT | Field.OUTPUT, currency: Currency) => {
-      console.log('onCurrencySelection', field, currency)
+      // console.log('onCurrencySelection', field, currency)
       dispatch(
         selectCurrency({
           field,
           currencyId: currency.isToken ? currency.address : currency.isNative ? 'ETH' : '',
         })
       )
+      if (account) {
+        fetchNFT(field, assets(account), true)
+      }
+
+      // useFetchNFTListCallback()(field, assets(owner), true)
+
+      // 获取当前tokenList
+      // dispatch(
+      //   selectCurrency({
+      //     field,
+      //     currencyId: currency.isToken ? currency.address : currency.isNative ? 'ETH' : '',
+      //   })
+      // )
     },
-    [dispatch]
+    [dispatch, fetchNFT, account]
+  )
+
+  const onNFTSelection = useCallback(
+    (field: Field.YIN_NFT | Field.YANG_NFT, nft: NFToken) => {
+      // console.log('onNFTSelection当前选中的NFT', field, nft)
+      dispatch(
+        selectNFT({
+          field,
+          token: nft,
+        })
+      )
+
+      // if (account) {
+      //   fetchNFT(field, assets(account), true)
+      // }
+
+      // useFetchNFTListCallback()(field, assets(owner), true)
+
+      // 获取当前tokenList
+      // dispatch(
+      //   selectCurrency({
+      //     field,
+      //     currencyId: currency.isToken ? currency.address : currency.isNative ? 'ETH' : '',
+      //   })
+      // )
+    },
+    [dispatch, account]
   )
 
   const onSwitchTokens = useCallback(() => {
@@ -71,6 +125,7 @@ export function useSwapActionHandlers(): {
     onSwitchTokens,
     onCurrencySelection,
     onUserInput,
+    onNFTSelection,
     onChangeRecipient,
   }
 }
@@ -151,7 +206,7 @@ export function useDerivedSwapInfo(toggledVersion: Version | undefined): {
     outputCurrency ?? undefined,
   ])
 
-  const isExactIn: boolean = independentField === Field.INPUT
+  const isExactIn: boolean = independentField === Field.YIN_NFT
   const parsedAmount = useMemo(
     () => tryParseAmount(typedValue, (isExactIn ? inputCurrency : outputCurrency) ?? undefined),
     [inputCurrency, isExactIn, outputCurrency, typedValue]
@@ -289,14 +344,28 @@ export function queryParametersToSwapState(parsedQs: ParsedQs): MergeSwapState {
     [Field.OUTPUT]: {
       currencyId: outputCurrency === '' ? null : outputCurrency ?? null,
     },
-    [Field.INPUT_NFT]: {
-      tokenId: inputTokenId === '' ? null : parseInt(inputTokenId, 10) ?? null,
+    // 根据tokenId 获取token信息
+    [Field.YIN_NFT]: {
+      tokenId: inputTokenId,
+      tokenName: '',
+      tokenURI: '',
+      description: '',
+      contract: '',
+      symbol: '',
+      contractName: '',
     },
-    [Field.OUTPUT_NFT]: {
-      tokenId: outputTokenId === '' ? null : parseInt(outputTokenId, 10) ?? null,
+    [Field.YANG_NFT]: {
+      tokenId: outputTokenId,
+      tokenName: '',
+      tokenURI: '',
+      description: '',
+      contract: '',
+      symbol: '',
+      contractName: '',
     },
     typedValue: parseTokenAmountURLParameter(parsedQs.exactAmount),
-    independentField: parseIndependentFieldURLParameter(parsedQs.exactField),
+    // independentField: parseIndependentFieldURLParameter(parsedQs.exactField),
+    independentField: Field.YIN_NFT,
     recipient,
   }
 }

@@ -1,3 +1,4 @@
+/* eslint-disable unused-imports/no-unused-imports */
 import { Trans } from '@lingui/macro'
 import { Currency, CurrencyAmount, Token, TradeType } from '@uniswap/sdk-core'
 import { Trade as V2Trade } from '@uniswap/v2-sdk'
@@ -10,6 +11,7 @@ import SwapRoute from 'components/swap/SwapRoute'
 import TradePrice from 'components/swap/TradePrice'
 import UnsupportedCurrencyFooter from 'components/swap/UnsupportedCurrencyFooter'
 import { MouseoverTooltip, MouseoverTooltipContent } from 'components/Tooltip'
+import { useFetchNFTListCallback } from 'hooks/useFetchListCallback'
 import JSBI from 'jsbi'
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { CheckCircle, HelpCircle, Info, Plus } from 'react-feather'
@@ -22,11 +24,14 @@ import styled, { ThemeContext } from 'styled-components/macro'
 import AddressInputPanel from '../../components/AddressInputPanel'
 import { ButtonConfirmed, ButtonError, ButtonLight, ButtonPrimary } from '../../components/Button'
 import { GreyCard } from '../../components/Card'
-import { AutoColumn } from '../../components/Column'
+import Column, { AutoColumn } from '../../components/Column'
 import CurrencyLogo from '../../components/CurrencyLogo'
-import CurrencySelectPanel from '../../components/CurrencySelectPanel'
+import NFTSelectPanel from '../../components/CurrencySelectPanel'
 import Loader from '../../components/Loader'
+import { StickBall } from '../../components/merge/FastAccess'
 import MergeHeader from '../../components/merge/MergeHeader'
+import MergeWrapper from '../../components/merge/MergeWrapper'
+import NFTListPanel from '../../components/NFTListPanel'
 import Row, { AutoRow, RowFixed } from '../../components/Row'
 import confirmPriceImpactWithoutFee from '../../components/swap/confirmPriceImpactWithoutFee'
 import ConfirmSwapModal from '../../components/swap/ConfirmSwapModal'
@@ -39,6 +44,7 @@ import {
 } from '../../components/swap/styleds'
 import { SwitchLocaleLink } from '../../components/SwitchLocaleLink'
 import TokenWarningModal from '../../components/TokenWarningModal'
+import { assets } from '../../constants/opensea'
 import { useAllTokens, useCurrency } from '../../hooks/Tokens'
 import { ApprovalState, useApproveCallbackFromTrade } from '../../hooks/useApproveCallback'
 import useENSAddress from '../../hooks/useENSAddress'
@@ -51,20 +57,20 @@ import { useUSDCValue } from '../../hooks/useUSDCPrice'
 import useWrapCallback, { WrapType } from '../../hooks/useWrapCallback'
 import { useActiveWeb3React } from '../../hooks/web3'
 import { useWalletModalToggle } from '../../state/application/hooks'
+import { Field } from '../../state/merge/actions'
 import {
   useDefaultsFromURLSearch,
   useDerivedSwapInfo,
   useMergeSwapState,
   useSwapActionHandlers,
-} from '../../state/mergeSwap/hooks'
-import { Field } from '../../state/swap/actions'
+} from '../../state/merge/hooks'
 import { useExpertModeManager } from '../../state/user/hooks'
 import { LinkStyledButton, TYPE } from '../../theme'
 import { computeFiatValuePriceImpact } from '../../utils/computeFiatValuePriceImpact'
 import { getTradeVersion } from '../../utils/getTradeVersion'
 import { maxAmountSpend } from '../../utils/maxAmountSpend'
 import { warningSeverity } from '../../utils/prices'
-import AppBody from '../AppBody'
+import AppBody from '../MergeAppBody'
 
 const StyledInfo = styled(Info)`
   height: 16px;
@@ -74,6 +80,21 @@ const StyledInfo = styled(Info)`
   :hover {
     color: ${({ theme }) => theme.text1};
   }
+`
+
+const StyledColumn = styled(Column)`
+  height 100%;
+`
+
+const StyledRow = styled(Row)`
+  padding: 0.5rem 0.5rem 0.5rem 0.5rem;
+`
+
+const StyledButtonPrimary = styled(ButtonPrimary)`
+  padding: 0.75rem;
+  ${({ theme }) => theme.mediaWidth.upToExtraSmall`
+    padding: 10px;
+  `};
 `
 
 export default function Merge({ history }: RouteComponentProps) {
@@ -96,6 +117,9 @@ export default function Merge({ history }: RouteComponentProps) {
 
   // dismiss warning if all imported tokens are in active lists
   const defaultTokens = useAllTokens()
+
+  const fetchNFT = useFetchNFTListCallback()
+
   const importTokensNotInDefault =
     urlLoadedTokens &&
     urlLoadedTokens.filter((token: Token) => {
@@ -114,7 +138,20 @@ export default function Merge({ history }: RouteComponentProps) {
   const toggledVersion = useToggledVersion()
 
   // swap state
-  const { independentField, typedValue, recipient } = useMergeSwapState()
+  const {
+    currentNFTs,
+    independentField,
+    typedValue,
+    recipient,
+    [Field.INPUT]: inputData,
+    [Field.YIN_NFT]: yinNFT,
+    [Field.YANG_NFT]: yangNFT,
+  } = useMergeSwapState()
+
+  useEffect(() => {
+    console.log('当前选中的NFT:', yinNFT, yangNFT)
+  }, [yinNFT, yangNFT])
+
   const {
     v3Trade: { state: v3TradeState },
     bestTrade: trade,
@@ -130,20 +167,21 @@ export default function Merge({ history }: RouteComponentProps) {
     execute: onWrap,
     inputError: wrapInputError,
   } = useWrapCallback(currencies[Field.INPUT], currencies[Field.OUTPUT], typedValue)
+
   const showWrap: boolean = wrapType !== WrapType.NOT_APPLICABLE
   const { address: recipientAddress } = useENSAddress(recipient)
 
   const parsedAmounts = useMemo(
     () =>
-      showWrap
-        ? {
-            [Field.INPUT]: parsedAmount,
-            [Field.OUTPUT]: parsedAmount,
-          }
-        : {
-            [Field.INPUT]: independentField === Field.INPUT ? parsedAmount : trade?.inputAmount,
-            [Field.OUTPUT]: independentField === Field.OUTPUT ? parsedAmount : trade?.outputAmount,
-          },
+      // showWrap
+      ({
+        [Field.INPUT]: parsedAmount,
+        [Field.OUTPUT]: parsedAmount,
+      }),
+    // : {
+    //     [Field.INPUT]: independentField === Field.INPUT ? parsedAmount : trade?.inputAmount,
+    //     [Field.OUTPUT]: independentField === Field.OUTPUT ? parsedAmount : trade?.outputAmount,
+    //   },
     [independentField, parsedAmount, showWrap, trade]
   )
 
@@ -160,9 +198,11 @@ export default function Merge({ history }: RouteComponentProps) {
   const fiatValueOutput = useUSDCValue(parsedAmounts[Field.OUTPUT])
   const priceImpact = routeIsSyncing ? undefined : computeFiatValuePriceImpact(fiatValueInput, fiatValueOutput)
 
-  const { onSwitchTokens, onCurrencySelection, onUserInput, onChangeRecipient } = useSwapActionHandlers()
+  const { onSwitchTokens, onNFTSelection, onCurrencySelection, onUserInput, onChangeRecipient } =
+    useSwapActionHandlers()
+
   const isValid = !swapInputError
-  const dependentField: Field = independentField === Field.INPUT ? Field.OUTPUT : Field.INPUT
+  const dependentField: Field = independentField === Field.YIN_NFT ? Field.YANG_NFT : Field.YIN_NFT
 
   const handleTypeInput = useCallback(
     (value: string) => {
@@ -200,14 +240,15 @@ export default function Merge({ history }: RouteComponentProps) {
 
   const formattedAmounts = {
     [independentField]: typedValue,
-    [dependentField]: showWrap
-      ? parsedAmounts[independentField]?.toExact() ?? ''
-      : parsedAmounts[dependentField]?.toSignificant(6) ?? '',
+    // [dependentField]: showWrap
+    //   ? parsedAmounts[independentField]?.toExact() ?? ''
+    //   : parsedAmounts[dependentField]?.toSignificant(6) ?? '',
   }
 
-  const userHasSpecifiedInputOutput = Boolean(
-    currencies[Field.INPUT] && currencies[Field.OUTPUT] && parsedAmounts[independentField]?.greaterThan(JSBI.BigInt(0))
-  )
+  const userHasSpecifiedInputOutput = false
+  // const userHasSpecifiedInputOutput = Boolean(
+  //   currencies[Field.INPUT] && currencies[Field.OUTPUT] && parsedAmounts[independentField]?.greaterThan(JSBI.BigInt(0))
+  // )
 
   // check whether the user has approved the router on the input token
   const [approvalState, approveCallback] = useApproveCallbackFromTrade(trade, allowedSlippage)
@@ -247,6 +288,13 @@ export default function Merge({ history }: RouteComponentProps) {
       setApprovalSubmitted(true)
     }
   }, [approvalState, approvalSubmitted])
+
+  useEffect(() => {
+    // fetchNFT(field, assets(account), true)
+    if (account) {
+      fetchNFT(Field.INPUT, assets(account), true)
+    }
+  }, [fetchNFT, account])
 
   const maxInputAmount: CurrencyAmount<Currency> | undefined = maxAmountSpend(currencyBalances[Field.INPUT])
   const showMaxButton = Boolean(maxInputAmount?.greaterThan(0) && !parsedAmounts[Field.INPUT]?.equalTo(maxInputAmount))
@@ -338,11 +386,19 @@ export default function Merge({ history }: RouteComponentProps) {
 
   const handleInputSelect = useCallback(
     (inputCurrency) => {
-      console.log('handleInputSelect::', inputCurrency)
+      // console.log('handleInputSelect::', inputCurrency)
       setApprovalSubmitted(false) // reset 2 step UI for approvals
       onCurrencySelection(Field.INPUT, inputCurrency)
     },
     [onCurrencySelection]
+  )
+
+  const handleNFTSelect = useCallback(
+    (token) => {
+      console.log('执行handleNFTSelect::', independentField, token)
+      onNFTSelection && onNFTSelection(independentField, token)
+    },
+    [independentField, onNFTSelection]
   )
 
   const handleMaxInput = useCallback(() => {
@@ -387,52 +443,28 @@ export default function Merge({ history }: RouteComponentProps) {
             swapErrorMessage={swapErrorMessage}
             onDismiss={handleConfirmDismiss}
           />
-
           <AutoColumn gap={'sm'}>
             <div style={{ display: 'relative' }}>
-              <CurrencySelectPanel
-                label={
-                  independentField === Field.OUTPUT && !showWrap ? <Trans>From (at most)</Trans> : <Trans>From</Trans>
-                }
+              <NFTListPanel
+                // label={
+                //   independentField === Field.OUTPUT && !showWrap ? <Trans>From (at most)</Trans> : <Trans>From</Trans>
+                // }
                 value={formattedAmounts[Field.INPUT]}
                 showMaxButton={showMaxButton}
+                tokenList={currentNFTs?.nftList}
                 currency={currencies[Field.INPUT]}
+                otherCurrency={currencies[Field.OUTPUT]}
+                yin={yinNFT}
+                yang={yangNFT}
                 onUserInput={handleTypeInput}
                 onMax={handleMaxInput}
                 hideInput={true}
                 fiatValue={fiatValueInput ?? undefined}
-                onCurrencySelect={handleInputSelect}
-                otherCurrency={currencies[Field.OUTPUT]}
+                onNFTSelect={handleNFTSelect}
                 showCommonBases={true}
-                id="swap-currency-input"
-                loading={independentField === Field.OUTPUT && routeIsSyncing}
-              />
-              <PlusWrapper clickable>
-                <Plus
-                  size="16"
-                  onClick={() => {
-                    setApprovalSubmitted(false) // reset 2 step UI for approvals
-                    onSwitchTokens()
-                  }}
-                  color={currencies[Field.INPUT] && currencies[Field.OUTPUT] ? theme.text1 : theme.text3}
-                />
-              </PlusWrapper>
-              <CurrencySelectPanel
-                value={formattedAmounts[Field.OUTPUT]}
-                onUserInput={handleTypeOutput}
-                label={independentField === Field.INPUT && !showWrap ? <Trans>To (at least)</Trans> : <Trans>To</Trans>}
-                showMaxButton={false}
-                hideBalance={false}
-                hideInput={true}
-                fiatValue={fiatValueOutput ?? undefined}
-                priceImpact={priceImpact}
-                currency={currencies[Field.OUTPUT]}
-                onCurrencySelect={handleOutputSelect}
-                otherCurrency={currencies[Field.INPUT]}
-                showCommonBases={true}
-                id="swap-currency-output"
-                loading={independentField === Field.INPUT && routeIsSyncing}
-              />
+                id="nft-list-pannel"
+                // loading={independentField === Field.OUTPUT && routeIsSyncing}
+              ></NFTListPanel>
             </div>
 
             {recipient !== null && !showWrap ? (
@@ -505,161 +537,65 @@ export default function Merge({ history }: RouteComponentProps) {
                 </RowFixed>
               </Row>
             )}
-
-            <div>
-              {swapIsUnsupported ? (
-                <ButtonPrimary disabled={true}>
-                  <TYPE.main mb="4px">
-                    <Trans>Unsupported Asset</Trans>
-                  </TYPE.main>
-                </ButtonPrimary>
-              ) : !account ? (
-                <ButtonLight onClick={toggleWalletModal}>
-                  <Trans>Connect Wallet</Trans>
-                </ButtonLight>
-              ) : showWrap ? (
-                <ButtonPrimary disabled={Boolean(wrapInputError)} onClick={onWrap}>
-                  {wrapInputError ??
-                    (wrapType === WrapType.WRAP ? (
-                      <Trans>Wrap</Trans>
-                    ) : wrapType === WrapType.UNWRAP ? (
-                      <Trans>Unwrap</Trans>
-                    ) : null)}
-                </ButtonPrimary>
-              ) : routeIsSyncing || routeIsLoading ? (
-                <GreyCard style={{ textAlign: 'center' }}>
-                  <TYPE.main mb="4px">
-                    <Dots>
-                      <Trans>Loading</Trans>
-                    </Dots>
-                  </TYPE.main>
-                </GreyCard>
-              ) : routeNotFound && userHasSpecifiedInputOutput ? (
-                <GreyCard style={{ textAlign: 'center' }}>
-                  <TYPE.main mb="4px">
-                    <Trans>Insufficient liquidity for this trade.</Trans>
-                  </TYPE.main>
-                </GreyCard>
-              ) : showApproveFlow ? (
-                <AutoRow style={{ flexWrap: 'nowrap', width: '100%' }}>
-                  <AutoColumn style={{ width: '100%' }} gap="12px">
-                    <ButtonConfirmed
-                      onClick={handleApprove}
-                      disabled={
-                        approvalState !== ApprovalState.NOT_APPROVED ||
-                        approvalSubmitted ||
-                        signatureState === UseERC20PermitState.SIGNED
-                      }
-                      width="100%"
-                      altDisabledStyle={approvalState === ApprovalState.PENDING} // show solid button while waiting
-                      confirmed={
-                        approvalState === ApprovalState.APPROVED || signatureState === UseERC20PermitState.SIGNED
-                      }
-                    >
-                      <AutoRow justify="space-between" style={{ flexWrap: 'nowrap' }}>
-                        <span style={{ display: 'flex', alignItems: 'center' }}>
-                          <CurrencyLogo
-                            currency={currencies[Field.INPUT]}
-                            size={'20px'}
-                            style={{ marginRight: '8px', flexShrink: 0 }}
-                          />
-                          {/* we need to shorten this string on mobile */}
-                          {approvalState === ApprovalState.APPROVED || signatureState === UseERC20PermitState.SIGNED ? (
-                            <Trans>You can now trade {currencies[Field.INPUT]?.symbol}</Trans>
-                          ) : (
-                            <Trans>Allow the Uniswap Protocol to use your {currencies[Field.INPUT]?.symbol}</Trans>
-                          )}
-                        </span>
-                        {approvalState === ApprovalState.PENDING ? (
-                          <Loader stroke="white" />
-                        ) : (approvalSubmitted && approvalState === ApprovalState.APPROVED) ||
-                          signatureState === UseERC20PermitState.SIGNED ? (
-                          <CheckCircle size="20" color={theme.green1} />
-                        ) : (
-                          <MouseoverTooltip
-                            text={
-                              <Trans>
-                                You must give the Uniswap smart contracts permission to use your{' '}
-                                {currencies[Field.INPUT]?.symbol}. You only have to do this once per token.
-                              </Trans>
-                            }
-                          >
-                            <HelpCircle size="20" color={'white'} style={{ marginLeft: '8px' }} />
-                          </MouseoverTooltip>
-                        )}
-                      </AutoRow>
-                    </ButtonConfirmed>
-                    <ButtonError
-                      onClick={() => {
-                        if (isExpertMode) {
-                          handleSwap()
-                        } else {
-                          setSwapState({
-                            tradeToConfirm: trade,
-                            attemptingTxn: false,
-                            swapErrorMessage: undefined,
-                            showConfirm: true,
-                            txHash: undefined,
-                          })
-                        }
-                      }}
-                      width="100%"
-                      id="swap-button"
-                      disabled={
-                        !isValid ||
-                        (approvalState !== ApprovalState.APPROVED && signatureState !== UseERC20PermitState.SIGNED) ||
-                        priceImpactTooHigh
-                      }
-                      error={isValid && priceImpactSeverity > 2}
-                    >
-                      <Text fontSize={16} fontWeight={500}>
-                        {priceImpactTooHigh ? (
-                          <Trans>High Price Impact</Trans>
-                        ) : priceImpactSeverity > 2 ? (
-                          <Trans>Swap Anyway</Trans>
-                        ) : (
-                          <Trans>Merge</Trans>
-                        )}
-                      </Text>
-                    </ButtonError>
-                  </AutoColumn>
-                </AutoRow>
-              ) : (
-                <ButtonError
-                  onClick={() => {
-                    if (isExpertMode) {
-                      handleSwap()
-                    } else {
-                      setSwapState({
-                        tradeToConfirm: trade,
-                        attemptingTxn: false,
-                        swapErrorMessage: undefined,
-                        showConfirm: true,
-                        txHash: undefined,
-                      })
-                    }
-                  }}
-                  id="swap-button"
-                  disabled={!isValid || priceImpactTooHigh || !!swapCallbackError}
-                  error={isValid && priceImpactSeverity > 2 && !swapCallbackError}
-                >
-                  <Text fontSize={20} fontWeight={500}>
-                    {swapInputError ? (
-                      swapInputError
-                    ) : priceImpactTooHigh ? (
-                      <Trans>Price Impact Too High</Trans>
-                    ) : priceImpactSeverity > 2 ? (
-                      <Trans>Swap Anyway</Trans>
-                    ) : (
-                      <Trans>Swap</Trans>
-                    )}
-                  </Text>
-                </ButtonError>
-              )}
-              {isExpertMode && swapErrorMessage ? <SwapCallbackError error={swapErrorMessage} /> : null}
-            </div>
           </AutoColumn>
         </Wrapper>
+        <StickBall>
+          <StyledColumn>
+            <MergeWrapper>
+              <NFTSelectPanel
+                // label={
+                //   independentField === Field.OUTPUT && !showWrap ? <Trans>From (at most)</Trans> : <Trans>From</Trans>
+                // }
+                value={formattedAmounts[Field.INPUT]}
+                showMaxButton={showMaxButton}
+                tokenList={inputData.nftList}
+                currency={currencies[Field.INPUT]}
+                nft={yinNFT}
+                onUserInput={handleTypeInput}
+                onMax={handleMaxInput}
+                hideInput={true}
+                fiatValue={fiatValueInput ?? undefined}
+                onCurrencySelect={handleInputSelect}
+                otherCurrency={currencies[Field.OUTPUT]}
+                otherNft={yangNFT}
+                showCommonBases={true}
+                id="merge-nft-yin"
+                // loading={independentField === Field.OUTPUT && routeIsSyncing}
+              />
+              <PlusWrapper clickable>
+                <Plus
+                  size="16"
+                  onClick={() => {
+                    setApprovalSubmitted(false) // reset 2 step UI for approvals
+                    onSwitchTokens()
+                  }}
+                  color={currencies[Field.INPUT] && currencies[Field.OUTPUT] ? theme.text1 : theme.text3}
+                />
+              </PlusWrapper>
+              <NFTSelectPanel
+                value={formattedAmounts[Field.OUTPUT]}
+                onUserInput={handleTypeOutput}
+                // label={independentField === Field.INPUT && !showWrap ? <Trans>To (at least)</Trans> : <Trans>To</Trans>}
+                showMaxButton={false}
+                hideBalance={false}
+                hideInput={true}
+                fiatValue={fiatValueOutput ?? undefined}
+                priceImpact={priceImpact}
+                currency={currencies[Field.OUTPUT]}
+                nft={yangNFT}
+                onCurrencySelect={handleOutputSelect}
+                otherCurrency={currencies[Field.INPUT]}
+                otherNft={yinNFT}
+                showCommonBases={true}
+                id="merge-nft-yang"
+                // loading={independentField === Field.INPUT && routeIsSyncing}
+              />
+            </MergeWrapper>
+            <StyledRow>
+              <StyledButtonPrimary>Merge</StyledButtonPrimary>
+            </StyledRow>
+          </StyledColumn>
+        </StickBall>
       </AppBody>
       <SwitchLocaleLink />
       {!swapIsUnsupported ? null : (
