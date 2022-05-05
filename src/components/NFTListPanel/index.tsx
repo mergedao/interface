@@ -1,13 +1,15 @@
 import { Currency, CurrencyAmount, Percent, Token } from '@uniswap/sdk-core'
 import { Pair } from '@uniswap/v2-sdk'
+import { useNFTApproveCallback } from 'hooks/useNFTApproveCallback'
 // import { AutoColumn } from 'components/Column'
 import { darken, transparentize } from 'polished'
-import { ReactNode, useCallback, useState } from 'react'
+import { ReactNode, useCallback, useEffect, useState } from 'react'
 import { CheckCircle } from 'react-feather'
 import { NFToken } from 'state/merge/reducer'
 import styled from 'styled-components/macro'
 
 import { ReactComponent as DropDown } from '../../assets/images/dropdown.svg'
+import useApproveCheck from '../../hooks/useApproveCheck'
 import useTheme from '../../hooks/useTheme'
 import { useActiveWeb3React } from '../../hooks/web3'
 import { useCurrencyBalance } from '../../state/wallet/hooks'
@@ -124,6 +126,9 @@ const NFTView = styled(StyledNFTImage)`
   object-fit: cover;
   // padding: 1rem 1rem 0.75rem 1rem;
   width: 100%;
+  img[src=''] {
+    display: none;
+  }
 `
 
 const LabelRow = styled.div`
@@ -210,6 +215,18 @@ const StyledMaskWrapper = styled.div`
   // align-items: center;
 `
 
+const StyledApproved = styled.div`
+  position: absolute;
+  bottom: 13px;
+  right: 16px;
+  font-size: 12px;
+  padding: 2px;
+  cursor: pointer;
+  border-radius: 6px;
+  border: 1px solid ${({ theme }) => theme.text5};
+  background: ${({ theme }) => theme.bg1};
+`
+
 // const StyledNumericalInput = styled(NumericalInput)<{ $loading: boolean }>`
 //   ${loadingOpacityMixin}
 // `
@@ -223,12 +240,8 @@ interface CurrencyInputPanelProps {
   onCurrencySelect?: (currency: Currency) => void
   onNFTSelect?: (nft: NFToken) => void
   currency?: Currency | null
-  yin?: {
-    tokenId: string | undefined | null
-  } | null
-  yang?: {
-    tokenId: string | undefined | null
-  } | null
+  yin?: NFToken | null
+  yang?: NFToken | null
   hideBalance?: boolean
   pair?: Pair | null
   hideInput?: boolean
@@ -243,6 +256,32 @@ interface CurrencyInputPanelProps {
   locked?: boolean
   loading?: boolean
   tokenList?: NFToken[]
+}
+
+function ShowApprovStatus({ token }: { token: NFToken }) {
+  // const result = useOwnerOf(yin?.tokenId)
+  const approveResult = useApproveCheck(token?.tokenId, token?.contract)
+
+  // useEffect(() => {
+  //   if (result) {
+  //     console.log('ownerof result:', result)
+  //   }
+  // }, [yin?.tokenId, result.address])
+  const [status, approveCall] = useNFTApproveCallback(token)
+
+  const approveToken = useCallback(() => {
+    approveCall()
+  }, [approveCall])
+
+  useEffect(() => {
+    console.log('当前授权状态：', status)
+  }, [status])
+
+  useEffect(() => {
+    console.log('获取approve结果:', approveResult)
+  }, [token?.tokenId, approveResult.loading])
+
+  return <StyledApproved onClick={approveToken}>{approveResult.result ? '已授权' : '未授权'}</StyledApproved>
 }
 
 export default function NFTListPanel({
@@ -285,7 +324,7 @@ export default function NFTListPanel({
       if (!token) {
         return
       }
-      alert(`You have selected ${token.tokenId} from ${token.tokenName}`)
+      // alert(`You have selected ${token.tokenId} from ${token.tokenName}`)
       console.log('current nft Select:', token)
       onNFTSelect && onNFTSelect(token)
     },
@@ -296,21 +335,25 @@ export default function NFTListPanel({
     <SelectPanel id={id} hideInput={hideInput} {...rest}>
       <NFTFixedContainer>
         {tokenList &&
-          tokenList.map((token) => {
+          tokenList.map((token, idx) => {
             return (
               <Container
                 onClick={() => {
                   handleNFTSelect(token)
                 }}
-                key={token.tokenId}
+                key={token.tokenId + idx}
                 hideInput={hideInput}
               >
                 <SelectRow style={{ borderRadius: '8px' }} selected={!onCurrencySelect}>
                   <NFTView width="100%" height="auto" src={token.tokenURI}></NFTView>
+                  {token ? <ShowApprovStatus token={token} /> : null}
                 </SelectRow>
                 <StyledMask
-                  Yin={token.tokenId === yin?.tokenId}
-                  visible={token.tokenId === yin?.tokenId || token.tokenId === yang?.tokenId}
+                  Yin={token.contract === yin?.contract && token.tokenId === yin?.tokenId}
+                  visible={
+                    (token.contract === yin?.contract && token.tokenId === yin?.tokenId) ||
+                    (token.contract === yang?.contract && token.tokenId === yang?.tokenId)
+                  }
                 >
                   <StyledMaskWrapper>
                     <AutoRow justify="center" padding="0.5rem">

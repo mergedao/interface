@@ -18,6 +18,7 @@ import ERC20_BYTES32_ABI from 'abis/erc20_bytes32.json'
 import ERC721_ABI from 'abis/erc721.json'
 import ERC1155_ABI from 'abis/erc1155.json'
 import GOVERNOR_BRAVO_ABI from 'abis/governor-bravo.json'
+import MERGE_META from 'abis/merge.json'
 import WETH_ABI from 'abis/weth.json'
 import {
   ARGENT_WALLET_DETECTOR_ADDRESS,
@@ -25,6 +26,7 @@ import {
   GOVERNANCE_ALPHA_V0_ADDRESSES,
   GOVERNANCE_ALPHA_V1_ADDRESSES,
   GOVERNANCE_BRAVO_ADDRESSES,
+  MERGE_ADDRESSES,
   MERKLE_DISTRIBUTOR_ADDRESS,
   MULTICALL_ADDRESS,
   NONFUNGIBLE_POSITION_MANAGER_ADDRESSES,
@@ -37,7 +39,7 @@ import { NonfungiblePositionManager, Quoter, UniswapInterfaceMulticall } from 't
 import { V3Migrator } from 'types/v3/V3Migrator'
 import { getContract } from 'utils'
 
-import { ArgentWalletDetector, EnsPublicResolver, EnsRegistrar, Erc20, Erc721, Erc1155, Weth } from '../abis/types'
+import { ArgentWalletDetector, EnsPublicResolver, EnsRegistrar, Erc20, ERC721, Erc1155, Weth } from '../abis/types'
 import { UNI, WETH9_EXTENDED } from '../constants/tokens'
 import { useActiveWeb3React } from './web3'
 
@@ -78,7 +80,7 @@ export function useWETHContract(withSignerIfPossible?: boolean) {
 }
 
 export function useERC721Contract(nftAddress?: string) {
-  return useContract<Erc721>(nftAddress, ERC721_ABI, false)
+  return useContract<ERC721>(nftAddress, ERC721_ABI, true)
 }
 
 export function useERC1155Contract(nftAddress?: string) {
@@ -154,4 +156,8 @@ export function useV3NFTPositionManagerContract(withSignerIfPossible?: boolean):
 
 export function useV3Quoter() {
   return useContract<Quoter>(QUOTER_ADDRESSES, QuoterABI)
+}
+
+export function useMerge() {
+  return useContract(MERGE_ADDRESSES, MERGE_META.output.abi)
 }

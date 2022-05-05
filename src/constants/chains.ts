@@ -1,5 +1,6 @@
 import ethereumLogoUrl from 'assets/images/ethereum-logo.png'
 import arbitrumLogoUrl from 'assets/svg/arbitrum_logo.svg'
+import bnbLogoUrl from 'assets/svg/bnb.svg'
 import optimismLogoUrl from 'assets/svg/optimistic_ethereum.svg'
 import ms from 'ms.macro'
 
@@ -14,6 +15,11 @@ export enum SupportedChainId {
 
   BSCTEST = 97,
   BSCMAIN = 56,
+
+  // MATIC = 137,
+
+  // GLMR = 1284,
+  // MOVR = 1285,
 
   ARBITRUM_ONE = 42161,
   ARBITRUM_RINKEBY = 421611,
@@ -31,6 +37,11 @@ export const ALL_SUPPORTED_CHAIN_IDS: SupportedChainId[] = [
   SupportedChainId.BSCMAIN,
   SupportedChainId.BSCTEST,
 
+  // SupportedChainId.GLMR,
+  // SupportedChainId.MOVR,
+
+  // SupportedChainId.MATIC,
+
   SupportedChainId.ARBITRUM_ONE,
   SupportedChainId.ARBITRUM_RINKEBY,
   SupportedChainId.OPTIMISM,
@@ -43,6 +54,9 @@ export const L1_CHAIN_IDS = [
   SupportedChainId.RINKEBY,
   SupportedChainId.GOERLI,
   SupportedChainId.KOVAN,
+  // SupportedChainId.GLMR,
+  // SupportedChainId.MOVR,
+  // SupportedChainId.MATIC,
 
   SupportedChainId.BSCMAIN,
   SupportedChainId.BSCTEST,
@@ -175,16 +189,18 @@ export const CHAIN_INFO: ChainInfo = {
     docs: 'https://docs.uniswap.org/',
     explorer: 'https://goerli.etherscan.io/',
     infoLink: 'https://info.uniswap.org/#/',
-    label: 'Görli',
-    nativeCurrency: { name: 'Görli ETH', symbol: 'BNB', decimals: 18 },
+    label: 'BSC',
+    logoUrl: bnbLogoUrl,
+    nativeCurrency: { name: 'BSCMAIN BNB', symbol: 'BNB', decimals: 18 },
   },
 
   [SupportedChainId.BSCTEST]: {
     docs: 'https://docs.uniswap.org/',
     explorer: 'https://goerli.etherscan.io/',
     infoLink: 'https://info.uniswap.org/#/',
-    label: 'Görli',
-    nativeCurrency: { name: 'Görli ETH', symbol: 'tBNB', decimals: 18 },
+    label: 'BSC',
+    logoUrl: bnbLogoUrl,
+    nativeCurrency: { name: 'BSCTEST tBNB', symbol: 'tBNB', decimals: 18 },
   },
 }
 

@@ -246,7 +246,9 @@ export default function Header() {
   const { account, chainId } = useActiveWeb3React()
 
   const userEthBalance = useETHBalances(account ? [account] : [])?.[account ?? '']
+
   const [darkMode] = useDarkModeManager()
+
   const { white, black } = useTheme()
 
   const toggleClaimModal = useToggleSelfClaimModal()

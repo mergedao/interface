@@ -98,7 +98,7 @@ const StyledButtonPrimary = styled(ButtonPrimary)`
 `
 
 export default function Merge({ history }: RouteComponentProps) {
-  const { account } = useActiveWeb3React()
+  const { account, chainId } = useActiveWeb3React()
   const loadedUrlParams = useDefaultsFromURLSearch()
 
   // token warning stuff
@@ -292,9 +292,9 @@ export default function Merge({ history }: RouteComponentProps) {
   useEffect(() => {
     // fetchNFT(field, assets(account), true)
     if (account) {
-      fetchNFT(Field.INPUT, assets(account), true)
+      fetchNFT(Field.INPUT, assets(chainId, account), true)
     }
-  }, [fetchNFT, account])
+  }, [fetchNFT, account, chainId])
 
   const maxInputAmount: CurrencyAmount<Currency> | undefined = maxAmountSpend(currencyBalances[Field.INPUT])
   const showMaxButton = Boolean(maxInputAmount?.greaterThan(0) && !parsedAmounts[Field.INPUT]?.equalTo(maxInputAmount))

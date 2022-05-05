@@ -204,6 +204,20 @@ export const WETH9_EXTENDED: { [chainId: number]: Token } = {
     'WETH',
     'Wrapped Ether'
   ),
+  [SupportedChainId.BSCMAIN]: new Token(
+    SupportedChainId.BSCMAIN,
+    '0xB47e6A5f8b33b3F17603C83a0535A9dcD7E32681',
+    18,
+    'WETH',
+    'Wrapped Ether'
+  ),
+  [SupportedChainId.BSCTEST]: new Token(
+    SupportedChainId.BSCTEST,
+    '0xB47e6A5f8b33b3F17603C83a0535A9dcD7E32681',
+    18,
+    'WETH',
+    'Wrapped Ether'
+  ),
 }
 
 export class ExtendedEther extends Ether {

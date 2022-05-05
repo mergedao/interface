@@ -72,6 +72,14 @@ export const ENS_REGISTRAR_ADDRESSES: AddressMap = {
   [SupportedChainId.GOERLI]: '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e',
   [SupportedChainId.RINKEBY]: '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e',
 }
+
+export const MERGE_ADDRESSES: AddressMap = {
+  [SupportedChainId.MAINNET]: '',
+  [SupportedChainId.ROPSTEN]: '',
+  [SupportedChainId.GOERLI]: '',
+  [SupportedChainId.RINKEBY]: '0xE181496cC2dcCCc2A8257F69ADF50490752E729c',
+}
+
 export const SOCKS_CONTROLLER_ADDRESSES: AddressMap = {
   [SupportedChainId.MAINNET]: '0x65770b5283117639760beA3F867b69b3697a91dd',
 }

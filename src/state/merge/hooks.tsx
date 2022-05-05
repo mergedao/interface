@@ -48,7 +48,7 @@ export function useSwapActionHandlers(): {
 } {
   const dispatch = useAppDispatch()
   const fetchNFT = useFetchNFTListCallback()
-  const { account } = useActiveWeb3React()
+  const { account, chainId } = useActiveWeb3React()
 
   const onCurrencySelection = useCallback(
     (field: Field.INPUT | Field.OUTPUT, currency: Currency) => {
@@ -60,7 +60,7 @@ export function useSwapActionHandlers(): {
         })
       )
       if (account) {
-        fetchNFT(field, assets(account), true)
+        fetchNFT(field, assets(chainId, account), true)
       }
 
       // useFetchNFTListCallback()(field, assets(owner), true)

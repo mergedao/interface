@@ -172,8 +172,6 @@ export default function NetworkSelector() {
 
   const info = chainId ? CHAIN_INFO[chainId] : undefined
 
-  console.log('current use chain:', chainId, info)
-
   const isOnL2 = chainId ? L2_CHAIN_IDS.includes(chainId) : false
   const showSelector = Boolean(implements3085 || isOnL2)
   const mainnetInfo = CHAIN_INFO[SupportedChainId.MAINNET]

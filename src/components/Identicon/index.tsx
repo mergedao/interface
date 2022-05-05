@@ -31,7 +31,11 @@ export default function Identicon() {
       const current = ref.current
       current?.appendChild(icon)
       return () => {
-        current?.removeChild(icon)
+        try {
+          current?.removeChild(icon)
+        } catch (err) {
+          console.log('removeChild error', err)
+        }
       }
     }
     return

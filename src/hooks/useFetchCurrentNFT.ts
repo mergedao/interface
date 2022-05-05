@@ -16,7 +16,7 @@ export function useFetchCurrentNFT(): [fn] {
   const fetchNFT = useFetchNFTListCallback()
   const doFetchNFT = () => {
     if (account) {
-      return fetchNFT(Field.INPUT, assets(account), true)
+      return fetchNFT(Field.INPUT, assets(chainId, account), true)
     }
     return Promise.reject(new Error('no account'))
   }
