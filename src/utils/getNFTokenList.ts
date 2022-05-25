@@ -93,6 +93,7 @@ export default async function getNFTokenList(
           symbol: string
           name: string
         }
+        permalink: string
       }) => {
         json.tokens.push({
           tokenId: data.token_id,
@@ -102,6 +103,7 @@ export default async function getNFTokenList(
           contract: data.asset_contract.address,
           symbol: data.asset_contract.symbol,
           contractName: data.asset_contract.name,
+          openseaUrl: data.permalink,
         })
       }
     )

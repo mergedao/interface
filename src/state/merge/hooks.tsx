@@ -25,6 +25,7 @@ import { isAddress } from '../../utils'
 import { AppState } from '../index'
 import { useCurrencyBalances } from '../wallet/hooks'
 import {
+  cleanSelect,
   Field,
   replaceSwapState,
   selectCurrency,
@@ -32,6 +33,7 @@ import {
   setRecipient,
   switchCurrencies,
   typeInput,
+  updateTokenApproveStatus,
 } from './actions'
 import { MergeSwapState, NFToken } from './reducer'
 
@@ -402,4 +404,29 @@ export function useDefaultsFromURLSearch():
   }, [dispatch, chainId])
 
   return result
+}
+
+export function useCleanNFTSelect() {
+  const dispatch = useAppDispatch()
+  // useEffect(() => {
+  //   dispatch(cleanSelect())
+  // }, [dispatch])
+  return useCallback(() => {
+    dispatch(cleanSelect())
+  }, [dispatch])
+}
+
+export function useUpdateApprovedStatus() {
+  const dispatch = useAppDispatch()
+  return useCallback(
+    ({ tokenId, status }: { tokenId: string; status: boolean }) => {
+      dispatch(
+        updateTokenApproveStatus({
+          tokenId,
+          status,
+        })
+      )
+    },
+    [dispatch]
+  )
 }

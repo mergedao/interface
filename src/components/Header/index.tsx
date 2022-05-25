@@ -275,13 +275,24 @@ export default function Header() {
         </UniIcon>
       </Title>
       <HeaderLinks>
-        <StyledNavLink id={`swap-nav-link`} to={'/swap'}>
+        {/* <StyledNavLink id={`swap-nav-link`} to={'/swap'}>
           <Trans>Swap</Trans>
-        </StyledNavLink>
+        </StyledNavLink> */}
         <StyledNavLink id={`swap-nav-link`} to={'/merge'}>
           <Trans>Merge</Trans>
         </StyledNavLink>
         <StyledNavLink
+          id={`pool-nav-link`}
+          to=""
+          onClick={(evt) => {
+            alert('coming soon.')
+            evt.preventDefault()
+          }}
+          isActive={() => false}
+        >
+          <Trans>Pool</Trans>
+        </StyledNavLink>
+        {/* <StyledNavLink
           id={`pool-nav-link`}
           to={'/pool'}
           isActive={(match, { pathname }) =>
@@ -298,8 +309,16 @@ export default function Header() {
           <StyledNavLink id={`vote-nav-link`} to={'/vote'}>
             <Trans>Vote</Trans>
           </StyledNavLink>
-        )}
-        <StyledExternalLink id={`charts-nav-link`} href={infoLink}>
+        )} */}
+        <StyledExternalLink
+          onClick={(evt) => {
+            alert('coming soon.')
+            evt.preventDefault()
+            evt.stopPropagation()
+          }}
+          href=""
+          id={`charts-nav-link`}
+        >
           <Trans>Charts</Trans>
           <sup>↗</sup>
         </StyledExternalLink>

@@ -7,13 +7,13 @@ import { useActiveLocale } from 'hooks/useActiveLocale'
 import { useLocationLinkProps } from 'hooks/useLocationLinkProps'
 import React, { useEffect, useRef, useState } from 'react'
 import {
-  BookOpen,
+  // BookOpen,
   Check,
   ChevronLeft,
-  Coffee,
-  FileText,
+  // Coffee,
+  // FileText,
   Globe,
-  HelpCircle,
+  // HelpCircle,
   Info,
   MessageCircle,
   Moon,
@@ -243,25 +243,25 @@ export default function Menu() {
               default:
                 return (
                   <MenuFlyout>
-                    <MenuItem href="https://uniswap.org/">
+                    <MenuItem href="https://matter.services/">
                       <div>
                         <Trans>About</Trans>
                       </div>
                       <Info opacity={0.6} size={16} />
                     </MenuItem>
-                    <MenuItem href="https://help.uniswap.org/">
+                    {/* <MenuItem href="https://help.uniswap.org/">
                       <div>
                         <Trans>Help Center</Trans>
                       </div>
                       <HelpCircle opacity={0.6} size={16} />
-                    </MenuItem>
-                    <MenuItem href="https://uniswap.canny.io/feature-requests">
+                    </MenuItem> */}
+                    {/* <MenuItem href="https://uniswap.canny.io/feature-requests">
                       <div>
                         <Trans>Request Features</Trans>
                       </div>
                       <Coffee opacity={0.6} size={16} />
-                    </MenuItem>
-                    <MenuItem href="https://discord.gg/FCfyBSbCU5">
+                    </MenuItem> */}
+                    <MenuItem href="https://discord.gg/Rjn8z7Ykeb">
                       <div>
                         <Trans>Discord</Trans>
                       </div>
@@ -277,7 +277,7 @@ export default function Menu() {
                       <div>{darkMode ? <Trans>Light Theme</Trans> : <Trans>Dark Theme</Trans>}</div>
                       {darkMode ? <Moon opacity={0.6} size={16} /> : <Sun opacity={0.6} size={16} />}
                     </ToggleMenuItem>
-                    <MenuItem href="https://docs.uniswap.org/">
+                    {/* <MenuItem href="https://docs.uniswap.org/">
                       <div>
                         <Trans>Docs</Trans>
                       </div>
@@ -288,8 +288,8 @@ export default function Menu() {
                         <Trans>Legal & Privacy</Trans>
                       </div>
                       <FileText opacity={0.6} size={16} />
-                    </ToggleMenuItem>
-                    {showUNIClaimOption && (
+                    </ToggleMenuItem> */}
+                    {/* {showUNIClaimOption && (
                       <UNIbutton
                         onClick={openClaimModal}
                         padding="8px 16px"
@@ -299,7 +299,7 @@ export default function Menu() {
                       >
                         <Trans>Claim UNI</Trans>
                       </UNIbutton>
-                    )}
+                    )} */}
                   </MenuFlyout>
                 )
             }

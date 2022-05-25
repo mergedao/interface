@@ -20,7 +20,7 @@ import useTheme from '../../hooks/useTheme'
 import { useActiveWeb3React } from '../../hooks/web3'
 import { useCurrencyBalance } from '../../state/wallet/hooks'
 import { ButtonGray } from '../Button'
-import CurrencyLogo from '../CurrencyLogo'
+// import CurrencyLogo from '../CurrencyLogo'
 // import { Input as NumericalInput } from '../NumericalInput'
 import { RowFixed } from '../Row'
 // import CurrencySearchModal from '../SearchModal/CurrencySearchModal'
@@ -285,9 +285,9 @@ export default function NFTSelectPanel({
             >
               <Aligner>
                 <RowFixed title={`#${tokenId}`}>
-                  {currency ? (
+                  {/* {currency ? (
                     <CurrencyLogo style={{ marginRight: '0.5rem' }} currency={currency} size={'24px'} />
-                  ) : null}
+                  ) : null} */}
                   <StyledTokenName className="token-symbol-container" active={true}>
                     #
                     {(tokenId.length > 20

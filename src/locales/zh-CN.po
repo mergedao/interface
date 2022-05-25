@@ -1539,6 +1539,14 @@ msgstr "提供 {0} {1} 和 {2} {3}"
 msgid "Swap"
 msgstr "兑换"
 
+#: src/components/Header/index.tsx
+#: src/components/NavigationTabs/index.tsx
+#: src/components/swap/SwapHeader.tsx
+#: src/pages/Merge/index.tsx
+#: src/pages/Merge/index.tsx
+msgid "Merge"
+msgstr "合成"
+
 #: src/components/AccountDetails/TransactionSummary.tsx
 msgid "Swap <0/> for exactly <1/>"
 msgstr "将约 <0/> 兑换成 <1/>"
@@ -1822,8 +1830,8 @@ msgid "Uniswap Labs' Terms of Service"
 msgstr "Uniswap Labs 的服务条款"
 
 #: src/components/SwitchLocaleLink/index.tsx
-msgid "Uniswap available in: <0>{0}</0>"
-msgstr "Uniswap可用：<0>{0}</0>"
+msgid "Merge available in: <0>{0}</0>"
+msgstr "Merge可用：<0>{0}</0>"
 
 #: src/components/vote/ProposalEmptyState.tsx
 msgid "Uniswap governance is only available on Layer 1. Switch your network to Ethereum Mainnet to view Proposals and Vote."

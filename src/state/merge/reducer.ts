@@ -2,6 +2,7 @@ import { createReducer } from '@reduxjs/toolkit'
 import { parsedQueryString } from 'hooks/useParsedQueryString'
 
 import {
+  cleanSelect,
   fetchNFTokenList,
   Field,
   replaceSwapState,
@@ -11,6 +12,7 @@ import {
   switchCurrencies,
   switchNFT,
   typeInput,
+  updateTokenApproveStatus,
 } from './actions'
 import { queryParametersToSwapState } from './hooks'
 // import { WrappedTokenInfo } from './wrappedTokenInfo'
@@ -23,6 +25,8 @@ export interface NFToken {
   readonly contract: string
   readonly symbol: string
   readonly contractName: string
+  readonly approved?: boolean // 是否授权了
+  readonly openseaUrl?: string
   // readonly byUrl: {
   //   readonly [url: string]: {
   //     readonly current: TokenList | null
@@ -246,7 +250,38 @@ export default createReducer<MergeSwapState>(initialState, (builder) =>
         typedValue,
       }
     })
+    .addCase(cleanSelect, (state, { payload }) => {
+      return {
+        ...state,
+        // independentField: field,
+        [Field.YIN_NFT]: null,
+        [Field.YANG_NFT]: null,
+      }
+    })
     .addCase(setRecipient, (state, { payload: { recipient } }) => {
       state.recipient = recipient
+    })
+    .addCase(updateTokenApproveStatus, (state, { payload: { tokenId, status } }) => {
+      const newList = state.currentNFTs?.nftList?.map((token) => {
+        if (token.tokenId === tokenId) {
+          return {
+            ...token,
+            approved: status,
+          }
+        }
+        return token
+      })
+
+      return {
+        ...state,
+        currentNFTs: {
+          ...state.currentNFTs,
+          nftList: newList,
+        } as {
+          readonly loadingRequestId: string | null
+          readonly error: string | null
+          readonly nftList?: NFToken[]
+        },
+      }
     })
 )

@@ -37,6 +37,12 @@ export const selectNFT = createAction<{ field: Field.YIN_NFT | Field.YANG_NFT; t
 export const switchCurrencies = createAction<void>('mergeSwap/switchCurrencies')
 export const switchNFT = createAction<void>('mergeSwap/switchNFT')
 
+export const cleanSelect = createAction<void>('mergeSwap/cleanSelect')
+
+export const updateTokenApproveStatus = createAction<{ tokenId?: string; status: boolean }>(
+  'mergeSwap/updateTokenApproveStatus'
+)
+
 export const typeInput = createAction<{ field: Field.INPUT | Field.OUTPUT; typedValue: string }>('mergeSwap/typeInput')
 export const replaceSwapState = createAction<{
   field: Field.YIN_NFT | Field.YANG_NFT

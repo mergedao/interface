@@ -1,6 +1,6 @@
 import { animated, useSpring } from '@react-spring/web'
 import { useWindowSize } from 'hooks/useWindowSize'
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useImperativeHandle, useState } from 'react'
 import { Pocket, X } from 'react-feather'
 import styled from 'styled-components/macro'
 
@@ -156,88 +156,97 @@ export interface IStickBallProps {
   children?: React.ReactNode
 }
 
-export function StickBall(
-  props: IStickBallProps = {
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-  }
-) {
-  const {
-    className = '',
-    top = 0,
-    bottom = 180,
-    left = 0,
-    right = 0,
-    show = false,
-    size = {
-      width: 400,
-      height: 400,
+export const StickBall = React.forwardRef(
+  (
+    props: IStickBallProps = {
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
     },
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
-    onChange = () => {},
-    children,
-  } = props
+    ref
+  ) => {
+    const {
+      className = '',
+      top = 0,
+      bottom = 180,
+      left = 0,
+      right = 0,
+      show = false,
+      size = {
+        width: 400,
+        height: 400,
+      },
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
+      onChange = () => {},
+      children,
+    } = props
 
-  const [isVisible, setVisiable] = useState(show)
-  const theme = useTheme()
-  const winSize = useWindowSize()
+    const [isVisible, setVisiable] = useState(show)
+    const theme = useTheme()
+    const winSize = useWindowSize()
 
-  const questionStyle = useSpring({
-    opacity: !isVisible ? 1 : 0,
-    scale: !isVisible ? 1 : 0,
-  })
+    const questionStyle = useSpring({
+      opacity: !isVisible ? 1 : 0,
+      scale: !isVisible ? 1 : 0,
+    })
 
-  const closeStyles = useSpring({
-    opacity: isVisible ? 1 : 0,
-    scale: isVisible ? 1 : 0,
-  })
+    const closeStyles = useSpring({
+      opacity: isVisible ? 1 : 0,
+      scale: isVisible ? 1 : 0,
+    })
 
-  const popverSize = {
-    width: winSize.width && winSize.width > 500 ? size.width : (size.width ?? 0) - 164,
-    height: size.height,
+    const popverSize = {
+      width: winSize.width && winSize.width > 500 ? size.width : (size.width ?? 0) - 164,
+      height: size.height,
+    }
+
+    const strickBottom = winSize.width && winSize.width > 500 ? bottom : bottom - 40
+    // const previousValueRef = useRef();
+    // const previousValue = previousValueRef.current;
+
+    // console.log(isVisible, show)
+
+    // if (show !== previousValue && show !== isVisible) {
+    //   setVisiable(value);
+    //   onChange(value);
+    // }
+
+    // useEffect(() => {
+    //   previousValueRef.current = isVisible;
+    // });
+
+    useEffect(() => {
+      setVisiable(show)
+    }, [show])
+
+    const handleClick = useCallback(() => {
+      setVisiable(!isVisible)
+      onChange(!isVisible)
+    }, [setVisiable, onChange, isVisible])
+
+    useImperativeHandle(ref, () => ({
+      setVisiable: (isVisible: boolean) => {
+        setVisiable(isVisible)
+      },
+    }))
+
+    return (
+      <Wrapper bottom={strickBottom}>
+        <PopoverBox isVisible={isVisible} size={popverSize}>
+          <Popover size={popverSize}>{children}</Popover>
+        </PopoverBox>
+        <div onClick={handleClick}>
+          <animated.div style={{ ...questionStyle }}>
+            <Pocket color={theme.text2} size={20} />
+            {/* <QuestionOutlined /> */}
+          </animated.div>
+          <animated.div style={{ ...closeStyles }}>
+            <X color={theme.text2} />
+            {/* <CloseOutlined /> */}
+          </animated.div>
+        </div>
+      </Wrapper>
+    )
   }
-
-  const strickBottom = winSize.width && winSize.width > 500 ? bottom : bottom - 40
-  // const previousValueRef = useRef();
-  // const previousValue = previousValueRef.current;
-
-  // console.log(isVisible, show)
-
-  // if (show !== previousValue && show !== isVisible) {
-  //   setVisiable(value);
-  //   onChange(value);
-  // }
-
-  // useEffect(() => {
-  //   previousValueRef.current = isVisible;
-  // });
-
-  useEffect(() => {
-    setVisiable(show)
-  }, [show])
-
-  const handleClick = useCallback(() => {
-    setVisiable(!isVisible)
-    onChange(!isVisible)
-  }, [setVisiable, onChange, isVisible])
-
-  return (
-    <Wrapper bottom={strickBottom}>
-      <PopoverBox isVisible={isVisible} size={popverSize}>
-        <Popover size={popverSize}>{children}</Popover>
-      </PopoverBox>
-      <div onClick={handleClick}>
-        <animated.div style={{ ...questionStyle }}>
-          <Pocket color={theme.text2} size={20} />
-          {/* <QuestionOutlined /> */}
-        </animated.div>
-        <animated.div style={{ ...closeStyles }}>
-          <X color={theme.text2} />
-          {/* <CloseOutlined /> */}
-        </animated.div>
-      </div>
-    </Wrapper>
-  )
-}
+)

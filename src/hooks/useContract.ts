@@ -39,7 +39,7 @@ import { NonfungiblePositionManager, Quoter, UniswapInterfaceMulticall } from 't
 import { V3Migrator } from 'types/v3/V3Migrator'
 import { getContract } from 'utils'
 
-import { ArgentWalletDetector, EnsPublicResolver, EnsRegistrar, Erc20, ERC721, Erc1155, Weth } from '../abis/types'
+import { ArgentWalletDetector, EnsPublicResolver, EnsRegistrar, Erc20, Erc721, Erc1155, Weth } from '../abis/types'
 import { UNI, WETH9_EXTENDED } from '../constants/tokens'
 import { useActiveWeb3React } from './web3'
 
@@ -80,7 +80,7 @@ export function useWETHContract(withSignerIfPossible?: boolean) {
 }
 
 export function useERC721Contract(nftAddress?: string) {
-  return useContract<ERC721>(nftAddress, ERC721_ABI, true)
+  return useContract<Erc721>(nftAddress, ERC721_ABI, true)
 }
 
 export function useERC1155Contract(nftAddress?: string) {
@@ -159,5 +159,5 @@ export function useV3Quoter() {
 }
 
 export function useMerge() {
-  return useContract(MERGE_ADDRESSES, MERGE_META.output.abi)
+  return useContract(MERGE_ADDRESSES, MERGE_META)
 }

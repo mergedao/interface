@@ -53,7 +53,7 @@ const ChartWrapper = styled.div`
   align-content: center;
 `
 
-function InfoBox({ message, icon }: { message?: ReactNode; icon: ReactNode }) {
+export function InfoBox({ message, icon }: { message?: ReactNode; icon: ReactNode }) {
   return (
     <ColumnCenter style={{ height: '100%', justifyContent: 'center' }}>
       {icon}

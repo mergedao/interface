@@ -10,10 +10,11 @@ import { AutoRouterLogo } from 'components/swap/RouterLabel'
 import SwapRoute from 'components/swap/SwapRoute'
 import TradePrice from 'components/swap/TradePrice'
 import UnsupportedCurrencyFooter from 'components/swap/UnsupportedCurrencyFooter'
-import { MouseoverTooltip, MouseoverTooltipContent } from 'components/Tooltip'
+import Tooltip, { MouseoverTooltip, MouseoverTooltipContent } from 'components/Tooltip'
 import { useFetchNFTListCallback } from 'hooks/useFetchListCallback'
+import { useNFTMergeCallback } from 'hooks/useNFTMergeCallback'
 import JSBI from 'jsbi'
-import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import { MouseEvent, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { CheckCircle, HelpCircle, Info, Plus } from 'react-feather'
 import ReactGA from 'react-ga'
 import { RouteComponentProps } from 'react-router-dom'
@@ -31,6 +32,7 @@ import Loader from '../../components/Loader'
 import { StickBall } from '../../components/merge/FastAccess'
 import MergeHeader from '../../components/merge/MergeHeader'
 import MergeWrapper from '../../components/merge/MergeWrapper'
+import ToolTipModal from '../../components/merge/ToolTipModal'
 import NFTListPanel from '../../components/NFTListPanel'
 import Row, { AutoRow, RowFixed } from '../../components/Row'
 import confirmPriceImpactWithoutFee from '../../components/swap/confirmPriceImpactWithoutFee'
@@ -59,6 +61,7 @@ import { useActiveWeb3React } from '../../hooks/web3'
 import { useWalletModalToggle } from '../../state/application/hooks'
 import { Field } from '../../state/merge/actions'
 import {
+  useCleanNFTSelect,
   useDefaultsFromURLSearch,
   useDerivedSwapInfo,
   useMergeSwapState,
@@ -115,10 +118,14 @@ export default function Merge({ history }: RouteComponentProps) {
     setDismissTokenWarning(true)
   }, [])
 
+  const strikBallRef = useRef<{ setVisiable: (isVisiable: boolean) => void }>(null)
+
   // dismiss warning if all imported tokens are in active lists
   const defaultTokens = useAllTokens()
 
   const fetchNFT = useFetchNFTListCallback()
+
+  const cleanSelectNFT = useCleanNFTSelect()
 
   const importTokensNotInDefault =
     urlLoadedTokens &&
@@ -147,6 +154,13 @@ export default function Merge({ history }: RouteComponentProps) {
     [Field.YIN_NFT]: yinNFT,
     [Field.YANG_NFT]: yangNFT,
   } = useMergeSwapState()
+
+  const [tipContent, setTipContent] = useState<string>('')
+  const [isTipOpen, setIsTipOpen] = useState(false)
+
+  const tipOpenDismiss = useCallback(() => {
+    setIsTipOpen(false)
+  }, [setIsTipOpen])
 
   useEffect(() => {
     console.log('当前选中的NFT:', yinNFT, yangNFT)
@@ -194,6 +208,8 @@ export default function Merge({ history }: RouteComponentProps) {
     [trade, v3TradeState]
   )
 
+  const [mergeStatus, doMerge] = useNFTMergeCallback(yinNFT, yangNFT)
+
   const fiatValueInput = useUSDCValue(parsedAmounts[Field.INPUT])
   const fiatValueOutput = useUSDCValue(parsedAmounts[Field.OUTPUT])
   const priceImpact = routeIsSyncing ? undefined : computeFiatValuePriceImpact(fiatValueInput, fiatValueOutput)
@@ -210,11 +226,32 @@ export default function Merge({ history }: RouteComponentProps) {
     },
     [onUserInput]
   )
+
   const handleTypeOutput = useCallback(
     (value: string) => {
       onUserInput(Field.OUTPUT, value)
     },
     [onUserInput]
+  )
+
+  const handleMerge = useCallback(
+    (evt: MouseEvent) => {
+      // 开始执行合并
+      doMerge()
+        .then(() => {
+          strikBallRef.current?.setVisiable(false)
+          cleanSelectNFT()
+          setTipContent('The merge request has been submitted, please wait patiently or refresh the page.')
+          console.log('合并请求已提交请耐心等待。')
+          setIsTipOpen(true)
+        })
+        .catch((err) => {
+          setTipContent('please approve first!')
+          setIsTipOpen(true)
+        })
+      console.log('打印当前合并状态：', mergeStatus)
+    },
+    [doMerge]
   )
 
   // reset if they close warning without tokens in params
@@ -427,6 +464,7 @@ export default function Merge({ history }: RouteComponentProps) {
         onDismiss={handleDismissTokenWarning}
       />
       <NetworkAlert />
+      <ToolTipModal isOpen={isTipOpen} onDismiss={tipOpenDismiss} content={tipContent}></ToolTipModal>
       <AppBody>
         <MergeHeader allowedSlippage={allowedSlippage} />
         <Wrapper id="merge-page">
@@ -539,7 +577,7 @@ export default function Merge({ history }: RouteComponentProps) {
             )}
           </AutoColumn>
         </Wrapper>
-        <StickBall>
+        <StickBall ref={strikBallRef}>
           <StyledColumn>
             <MergeWrapper>
               <NFTSelectPanel
@@ -592,7 +630,14 @@ export default function Merge({ history }: RouteComponentProps) {
               />
             </MergeWrapper>
             <StyledRow>
-              <StyledButtonPrimary>Merge</StyledButtonPrimary>
+              <StyledButtonPrimary
+                onClick={(evt) => {
+                  // alert('start merge')
+                  handleMerge(evt)
+                }}
+              >
+                Merge
+              </StyledButtonPrimary>
             </StyledRow>
           </StyledColumn>
         </StickBall>

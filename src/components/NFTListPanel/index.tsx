@@ -5,6 +5,7 @@ import { useNFTApproveCallback } from 'hooks/useNFTApproveCallback'
 import { darken, transparentize } from 'polished'
 import { ReactNode, useCallback, useEffect, useState } from 'react'
 import { CheckCircle } from 'react-feather'
+import { useUpdateApprovedStatus } from 'state/merge/hooks'
 import { NFToken } from 'state/merge/reducer'
 import styled from 'styled-components/macro'
 
@@ -14,6 +15,7 @@ import useTheme from '../../hooks/useTheme'
 import { useActiveWeb3React } from '../../hooks/web3'
 import { useCurrencyBalance } from '../../state/wallet/hooks'
 import { ButtonGray } from '../Button'
+import ToolTipModal from '../merge/ToolTipModal'
 import { AutoRow } from '../Row'
 // import { Input as NumericalInput } from '../NumericalInput'
 // import CurrencySearchModal from '../SearchModal/CurrencySearchModal'
@@ -227,6 +229,18 @@ const StyledApproved = styled.div`
   background: ${({ theme }) => theme.bg1};
 `
 
+const StyledOpenSeaWrapper = styled.div`
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 24px;
+  height: 24px;
+  img {
+    width: 100%;
+    height: 100%;
+  }
+`
+
 // const StyledNumericalInput = styled(NumericalInput)<{ $loading: boolean }>`
 //   ${loadingOpacityMixin}
 // `
@@ -261,27 +275,39 @@ interface CurrencyInputPanelProps {
 function ShowApprovStatus({ token }: { token: NFToken }) {
   // const result = useOwnerOf(yin?.tokenId)
   const approveResult = useApproveCheck(token?.tokenId, token?.contract)
+  const updateTokenApproveCall = useUpdateApprovedStatus()
 
-  // useEffect(() => {
-  //   if (result) {
-  //     console.log('ownerof result:', result)
-  //   }
-  // }, [yin?.tokenId, result.address])
   const [status, approveCall] = useNFTApproveCallback(token)
 
-  const approveToken = useCallback(() => {
-    approveCall()
-  }, [approveCall])
+  const approveToken = useCallback(
+    (evt) => {
+      if (approveResult.result) {
+        return
+      }
+      // 调用授权
+      approveCall()
+      // 组织时间传播
+      evt.stopPropagation()
+    },
+    [approveCall, approveResult.result]
+  )
 
   useEffect(() => {
-    console.log('当前授权状态：', status)
-  }, [status])
+    updateTokenApproveCall({
+      tokenId: token.tokenId,
+      status: approveResult.result,
+    })
+  }, [token.tokenId, approveResult.loading, approveResult.result])
 
   useEffect(() => {
     console.log('获取approve结果:', approveResult)
+    updateTokenApproveCall({
+      tokenId: token.tokenId,
+      status: approveResult.result,
+    })
   }, [token?.tokenId, approveResult.loading])
 
-  return <StyledApproved onClick={approveToken}>{approveResult.result ? '已授权' : '未授权'}</StyledApproved>
+  return <StyledApproved onClick={approveToken}>{approveResult.result ? 'approved' : 'unapproved'}</StyledApproved>
 }
 
 export default function NFTListPanel({
@@ -315,15 +341,25 @@ export default function NFTListPanel({
   const selectedCurrencyBalance = useCurrencyBalance(account ?? undefined, currency ?? undefined)
   const theme = useTheme()
 
-  const handleDismissSearch = useCallback(() => {
+  const [tipContent, setTipContent] = useState<string>('cannot be merged without approval.')
+
+  // const [isOpen, setIsOpen] = useState(false)
+
+  // const tipContentDismiss = useCallback(() => {
+  //   setModalOpen(false)
+  // }, [setModalOpen, isOpen])
+
+  const handleDismissTip = useCallback(() => {
     setModalOpen(false)
   }, [setModalOpen])
 
   const handleNFTSelect = useCallback(
     (token: NFToken) => {
-      if (!token) {
+      if (!token || !token.approved) {
+        setModalOpen(true)
         return
       }
+      // console.log('current nft approved status:', token.approved)
       // alert(`You have selected ${token.tokenId} from ${token.tokenName}`)
       console.log('current nft Select:', token)
       onNFTSelect && onNFTSelect(token)
@@ -344,6 +380,20 @@ export default function NFTListPanel({
                 key={token.tokenId + idx}
                 hideInput={hideInput}
               >
+                {token.openseaUrl && (
+                  <StyledOpenSeaWrapper>
+                    <a
+                      onClick={(evt) => {
+                        evt.stopPropagation()
+                      }}
+                      target="_blank"
+                      href={token.openseaUrl}
+                      rel="noreferrer"
+                    >
+                      <img src="https://opensea.io/static/images/logos/opensea.svg" alt={token.tokenName} />
+                    </a>
+                  </StyledOpenSeaWrapper>
+                )}
                 <SelectRow style={{ borderRadius: '8px' }} selected={!onCurrencySelect}>
                   <NFTView width="100%" height="auto" src={token.tokenURI}></NFTView>
                   {token ? <ShowApprovStatus token={token} /> : null}
@@ -369,6 +419,7 @@ export default function NFTListPanel({
             )
           })}
       </NFTFixedContainer>
+      <ToolTipModal onDismiss={handleDismissTip} isOpen={modalOpen} content={tipContent}></ToolTipModal>
       {/* {onCurrencySelect && (
         <NFCurrencySearchModal
           isOpen={modalOpen}
