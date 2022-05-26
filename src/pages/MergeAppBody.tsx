@@ -5,6 +5,19 @@ import { Z_INDEX } from 'theme'
 export const BodyWrapper = styled.main<{ margin?: string; maxWidth?: string }>`
   position: relative;
   margin-top: ${({ margin }) => margin ?? '0px'};
+  max-width: 1104px;
+  ${({ theme }) => theme.mediaWidth.upToLarge`
+    // padding: 1rem;
+    max-width: 832px;
+  `};
+  ${({ theme }) => theme.mediaWidth.upToMedium`
+    // padding: 1rem;
+    max-width: 560px;
+  `};
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+    // padding: 1rem;
+    max-width: auto;
+  `};
   // max-width: ${({ maxWidth }) => maxWidth ?? '480px'}; // 不设置最大宽
   width: 100%;
   background: ${({ theme }) => theme.bg0};
@@ -21,5 +34,9 @@ export const BodyWrapper = styled.main<{ margin?: string; maxWidth?: string }>`
  * The styled container element that wraps the content of most pages and the tabs.
  */
 export default function AppBody({ children, ...rest }: { children: React.ReactNode }) {
-  return <BodyWrapper {...rest}>{children}</BodyWrapper>
+  return (
+    <BodyWrapper maxWidth="1104px" {...rest}>
+      {children}
+    </BodyWrapper>
+  )
 }

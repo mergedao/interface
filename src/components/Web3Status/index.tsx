@@ -156,7 +156,7 @@ function Web3StatusInner() {
   // consle.log('current')
 
   // 只有rinkby是正确的网络
-  if (account && chainId === 4) {
+  if (account) {
     return (
       <Web3StatusConnected id="web3-status-connected" onClick={toggleWalletModal} pending={hasPendingTransactions}>
         {hasPendingTransactions ? (
@@ -175,17 +175,11 @@ function Web3StatusInner() {
         {!hasPendingTransactions && connector && <WrappedStatusIcon connector={connector} />}
       </Web3StatusConnected>
     )
-  } else if (error || chainId !== 4) {
+  } else if (error) {
     return (
       <Web3StatusError onClick={toggleWalletModal}>
         <NetworkIcon />
-        <Text>
-          {error instanceof UnsupportedChainIdError || chainId !== 4 ? (
-            <Trans>Wrong Network</Trans>
-          ) : (
-            <Trans>Error</Trans>
-          )}
-        </Text>
+        <Text>{error instanceof UnsupportedChainIdError ? <Trans>Wrong Network</Trans> : <Trans>Error</Trans>}</Text>
       </Web3StatusError>
     )
   } else {

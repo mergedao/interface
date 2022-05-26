@@ -52,7 +52,11 @@ const NFTFixedContainer = styled.div<{ top?: string }>`
   opacity: 0.95;
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-around;
+  justify-content: flex-start;
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+    // padding: 1rem;
+    justify-content: space-around;
+  `};
   z-index: 2;
   top: ${({ top }) => top || '0'};
 `
@@ -241,6 +245,12 @@ const StyledOpenSeaWrapper = styled.div`
   }
 `
 
+const StyleNoNFT = styled.div`
+  padding: 1rem 1rem 4rem 1rem;
+  text-align: center;
+  width: 100%;
+`
+
 // const StyledNumericalInput = styled(NumericalInput)<{ $loading: boolean }>`
 //   ${loadingOpacityMixin}
 // `
@@ -370,7 +380,7 @@ export default function NFTListPanel({
   return (
     <SelectPanel id={id} hideInput={hideInput} {...rest}>
       <NFTFixedContainer>
-        {tokenList &&
+        {tokenList && tokenList.length > 0 ? (
           tokenList.map((token, idx) => {
             return (
               <Container
@@ -417,7 +427,10 @@ export default function NFTListPanel({
                 </StyledMask>
               </Container>
             )
-          })}
+          })
+        ) : (
+          <StyleNoNFT>no nft found.</StyleNoNFT>
+        )}
       </NFTFixedContainer>
       <ToolTipModal onDismiss={handleDismissTip} isOpen={modalOpen} content={tipContent}></ToolTipModal>
       {/* {onCurrencySelect && (

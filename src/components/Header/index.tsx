@@ -1,3 +1,4 @@
+/* eslint-disable unused-imports/no-unused-imports */
 import { Trans } from '@lingui/macro'
 import useScrollPosition from '@react-hook/window-scroll'
 import { CHAIN_INFO, SupportedChainId } from 'constants/chains'
@@ -23,6 +24,7 @@ import Modal from '../Modal'
 import Row from '../Row'
 import { Dots } from '../swap/styleds'
 import Web3Status from '../Web3Status'
+import { ChainWarning } from './ChainWarning'
 import NetworkSelector from './NetworkSelector'
 import UniBalanceContent from './UniBalanceContent'
 
@@ -263,6 +265,7 @@ export default function Header() {
   const scrollY = useScrollPosition()
 
   const { infoLink } = CHAIN_INFO[chainId ? chainId : SupportedChainId.MAINNET]
+
   return (
     <HeaderFrame showBackground={scrollY > 45}>
       <ClaimModal />
@@ -329,7 +332,7 @@ export default function Header() {
           <NetworkSelector />
         </HeaderElement>
         <HeaderElement>
-          {availableClaim && !showClaimPopup && (
+          {/* {availableClaim && !showClaimPopup && (
             <UNIWrapper onClick={toggleClaimModal}>
               <UNIAmount active={!!account && !availableClaim} style={{ pointerEvents: 'auto' }}>
                 <TYPE.white padding="0 2px">
@@ -344,7 +347,7 @@ export default function Header() {
               </UNIAmount>
               <CardNoise />
             </UNIWrapper>
-          )}
+          )} */}
           <AccountElement active={!!account}>
             {account && userEthBalance ? (
               <BalanceText style={{ flexShrink: 0, userSelect: 'none' }} pl="0.75rem" pr="0.5rem" fontWeight={500}>
@@ -358,6 +361,7 @@ export default function Header() {
           <Menu />
         </HeaderElement>
       </HeaderControls>
+      <ChainWarning></ChainWarning>
     </HeaderFrame>
   )
 }
