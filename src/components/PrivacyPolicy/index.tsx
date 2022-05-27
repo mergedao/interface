@@ -118,12 +118,12 @@ export function PrivacyPolicy() {
       <AutoColumn gap="16px">
         <AutoColumn gap="8px" style={{ width: '100%' }}>
           <StyledExternalCard>
-            <ExternalLink href={'https://uniswap.org/terms-of-service'}>
+            <ExternalLink href={'https://matter.services'}>
               <RowBetween>
                 <AutoRow gap="4px">
                   <Info size={20} />
                   <TYPE.main fontSize={14} color={'primaryText1'}>
-                    <Trans>Uniswap Labs&apos; Terms of Service</Trans>
+                    <Trans>Matter Protocol&apos; Terms of Service</Trans>
                   </TYPE.main>
                 </AutoRow>
                 <StyledLinkOut size={20} />
@@ -131,7 +131,7 @@ export function PrivacyPolicy() {
             </ExternalLink>
           </StyledExternalCard>
           <StyledExternalCard>
-            <ExternalLink href={'https://uniswap.org/disclaimer/'}>
+            <ExternalLink href={'https://matter.services/'}>
               <RowBetween>
                 <AutoRow gap="4px">
                   <Info size={20} />
@@ -162,7 +162,7 @@ export function PrivacyPolicy() {
             </DarkGreyCard>
           ))}
           <Row justify="center" marginBottom="1rem">
-            <ExternalLink href="https://help.uniswap.org/en/articles/5675203-terms-of-service-faq">
+            <ExternalLink href="https://matter.services">
               <Trans>Learn more</Trans>
             </ExternalLink>
           </Row>

@@ -50,6 +50,9 @@ const Wrapper = styled.div<{ bottom?: number }>`
   }
   > div:last-child {
     margin-bottom: 13px;
+    ${({ theme }) => theme.mediaWidth.upToSmall`
+      margin-bottom: 0;
+    `}
     width: 100%;
     height: 100%;
     border-radius: 50%;

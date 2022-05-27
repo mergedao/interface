@@ -207,7 +207,11 @@ export default function SettingsTab({ placeholderSlippage }: { placeholderSlippa
                     <Trans>Auto Router</Trans>
                   </TYPE.black>
                   <QuestionHelper
-                    text={<Trans>Use the Uniswap Labs API to get better pricing through a more efficient route.</Trans>}
+                    text={
+                      <Trans>
+                        Use the Matter protocol Labs API to get better pricing through a more efficient route.
+                      </Trans>
+                    }
                   />
                 </RowFixed>
                 <Toggle
