@@ -1,3 +1,5 @@
+// eslint-disable-next-line no-restricted-imports
+import { t } from '@lingui/macro'
 import { Currency, CurrencyAmount, Percent, Token } from '@uniswap/sdk-core'
 import { Pair } from '@uniswap/v2-sdk'
 import { useNFTApproveCallback } from 'hooks/useNFTApproveCallback'
@@ -351,7 +353,7 @@ export default function NFTListPanel({
   const selectedCurrencyBalance = useCurrencyBalance(account ?? undefined, currency ?? undefined)
   const theme = useTheme()
 
-  const [tipContent, setTipContent] = useState<string>('cannot be merged without approval.')
+  const [tipContent, setTipContent] = useState<string>(t`cannot be merged without approval.`)
 
   // const [isOpen, setIsOpen] = useState(false)
 

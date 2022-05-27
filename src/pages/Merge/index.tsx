@@ -1,5 +1,6 @@
 /* eslint-disable unused-imports/no-unused-imports */
-import { Trans } from '@lingui/macro'
+// eslint-disable-next-line no-restricted-imports
+import { t, Trans } from '@lingui/macro'
 import { Currency, CurrencyAmount, Token, TradeType } from '@uniswap/sdk-core'
 import { Trade as V2Trade } from '@uniswap/v2-sdk'
 import { Trade as V3Trade } from '@uniswap/v3-sdk'
@@ -241,12 +242,12 @@ export default function Merge({ history }: RouteComponentProps) {
         .then(() => {
           strikBallRef.current?.setVisiable(false)
           cleanSelectNFT()
-          setTipContent('The merge request has been submitted, please wait patiently or refresh the page.')
+          setTipContent(t`The merge request has been submitted, please wait patiently or refresh the page.`)
           console.log('合并请求已提交请耐心等待。')
           setIsTipOpen(true)
         })
         .catch((err) => {
-          setTipContent('please approve first!')
+          setTipContent(t`please approve first!`)
           setIsTipOpen(true)
         })
       console.log('打印当前合并状态：', mergeStatus)
