@@ -126,9 +126,7 @@ export default function ToolTipModal({
     <Modal isOpen={isOpen} onDismiss={onDismiss} minHeight={false} maxHeight={90}>
       <Wrapper>
         <ContentWrapper>
-          <h5>
-            <Trans>{content}</Trans>
-          </h5>
+          <h5>{content}</h5>
         </ContentWrapper>
       </Wrapper>
     </Modal>
