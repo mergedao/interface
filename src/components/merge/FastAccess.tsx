@@ -12,8 +12,12 @@ const Wrapper = styled.div<{ bottom?: number }>`
   z-index: 9;
   background-color: ${({ theme }) => theme.bg2};
   position: fixed;
-  width: 36px;
-  height: 36px;
+  width: 4rem;
+  height: 4rem;
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+    width: 2.5rem;
+    height: 2.5rem;
+  `}
   border-radius: 50%;
   right: 40px;
   bottom: ${({ bottom }) => {
@@ -27,6 +31,7 @@ const Wrapper = styled.div<{ bottom?: number }>`
   justify-content: center;
   align-items: center;
   transition: all 0.2s ease-in-out;
+  flex-direction: column;
   box-shadow: ${({ theme }) => {
     return '0 0px 6px 3px ' + theme.text4 + ''
   }};
@@ -44,6 +49,7 @@ const Wrapper = styled.div<{ bottom?: number }>`
     }};
   }
   > div:last-child {
+    margin-bottom: 13px;
     width: 100%;
     height: 100%;
     border-radius: 50%;
@@ -106,6 +112,22 @@ const Popover = styled.div<{ size?: { width?: number; height?: number } }>`
   &.hide {
     display: none;
   }
+`
+
+const StyledMergeText = styled.span`
+  font-size: 12px;
+  padding-top: 2px;
+  position: absolute;
+  display: block;
+  bottom: 13px;
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+    display: none;
+  `}
+`
+
+const StyledAnmiWrapper = styled.div`
+  width: 20px;
+  height: 20px;
 `
 
 export interface IPopoverProps {
@@ -236,7 +258,8 @@ export const StickBall = React.forwardRef(
         <PopoverBox isVisible={isVisible} size={popverSize}>
           <Popover size={popverSize}>{children}</Popover>
         </PopoverBox>
-        <div onClick={handleClick}>
+        <StyledMergeText>merge</StyledMergeText>
+        <StyledAnmiWrapper onClick={handleClick}>
           <animated.div style={{ ...questionStyle }}>
             <Pocket color={theme.text2} size={20} />
             {/* <QuestionOutlined /> */}
@@ -245,7 +268,7 @@ export const StickBall = React.forwardRef(
             <X color={theme.text2} />
             {/* <CloseOutlined /> */}
           </animated.div>
-        </div>
+        </StyledAnmiWrapper>
       </Wrapper>
     )
   }
