@@ -465,7 +465,9 @@ export default function Merge({ history }: RouteComponentProps) {
         onDismiss={handleDismissTokenWarning}
       />
       <NetworkAlert />
-      <ToolTipModal isOpen={isTipOpen} onDismiss={tipOpenDismiss} content={tipContent}></ToolTipModal>
+      <ToolTipModal isOpen={isTipOpen} onDismiss={tipOpenDismiss}>
+        {tipContent}
+      </ToolTipModal>
       <AppBody>
         <MergeHeader allowedSlippage={allowedSlippage} />
         <Wrapper id="merge-page">

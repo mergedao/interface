@@ -1,4 +1,4 @@
-import { Trans } from '@lingui/macro'
+// import { Trans } from '@lingui/macro'
 import styled from 'styled-components/macro'
 
 import { ReactComponent as Close } from '../../assets/images/x.svg'
@@ -110,10 +110,12 @@ export default function ToolTipModal({
   onDismiss,
   isOpen,
   content,
+  children,
 }: {
   onDismiss: () => void
   isOpen: boolean
-  content: string
+  content?: string
+  children: React.ReactNode
 }): JSX.Element {
   // important that these are destructed from the account-specific web3-react context
   // const [toolTipOpen, setToolTipOpen] = useMemo(isOpen)
@@ -126,7 +128,7 @@ export default function ToolTipModal({
     <Modal isOpen={isOpen} onDismiss={onDismiss} minHeight={false} maxHeight={90}>
       <Wrapper>
         <ContentWrapper>
-          <h5>{content}</h5>
+          <h5>{content || children}</h5>
         </ContentWrapper>
       </Wrapper>
     </Modal>

@@ -394,10 +394,10 @@ export default function WalletModal({
               <AutoRow style={{ flexWrap: 'nowrap' }}>
                 <TYPE.black fontSize={14}>
                   <Trans>
-                    By connecting a wallet, you agree to Uniswap Labs’{' '}
-                    <ExternalLink href="https://uniswap.org/terms-of-service/">Terms of Service</ExternalLink> and
-                    acknowledge that you have read and understand the Uniswap{' '}
-                    <ExternalLink href="https://uniswap.org/disclaimer/">Protocol Disclaimer</ExternalLink>.
+                    By connecting a wallet, you agree to Matter Protocol Labs’{' '}
+                    <ExternalLink href="https://matter.services">Terms of Service</ExternalLink> and acknowledge that
+                    you have read and understand the Matter Protocol{' '}
+                    <ExternalLink href="https://matter.services">Protocol Disclaimer</ExternalLink>.
                   </Trans>
                 </TYPE.black>
               </AutoRow>

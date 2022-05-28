@@ -434,7 +434,9 @@ export default function NFTListPanel({
           <StyleNoNFT>no nft found.</StyleNoNFT>
         )}
       </NFTFixedContainer>
-      <ToolTipModal onDismiss={handleDismissTip} isOpen={modalOpen} content={tipContent}></ToolTipModal>
+      <ToolTipModal onDismiss={handleDismissTip} isOpen={modalOpen}>
+        {tipContent}
+      </ToolTipModal>
       {/* {onCurrencySelect && (
         <NFCurrencySearchModal
           isOpen={modalOpen}
