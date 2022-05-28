@@ -104,6 +104,7 @@ export default async function getNFTokenList(
           symbol: data.asset_contract.symbol,
           contractName: data.asset_contract.name,
           openseaUrl: data.permalink,
+          isMatter: false,
         })
       }
     )

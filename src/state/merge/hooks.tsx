@@ -355,6 +355,7 @@ export function queryParametersToSwapState(parsedQs: ParsedQs): MergeSwapState {
       contract: '',
       symbol: '',
       contractName: '',
+      isMatter: false,
     },
     [Field.YANG_NFT]: {
       tokenId: outputTokenId,
@@ -364,6 +365,7 @@ export function queryParametersToSwapState(parsedQs: ParsedQs): MergeSwapState {
       contract: '',
       symbol: '',
       contractName: '',
+      isMatter: false,
     },
     typedValue: parseTokenAmountURLParameter(parsedQs.exactAmount),
     // independentField: parseIndependentFieldURLParameter(parsedQs.exactField),

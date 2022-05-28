@@ -3,6 +3,7 @@ import { t } from '@lingui/macro'
 import { Currency, CurrencyAmount, Percent, Token } from '@uniswap/sdk-core'
 import { Pair } from '@uniswap/v2-sdk'
 import { useNFTApproveCallback } from 'hooks/useNFTApproveCallback'
+import { useNFTDeMergeCallback } from 'hooks/useNFTDemergeCallback'
 // import { AutoColumn } from 'components/Column'
 import { darken, transparentize } from 'polished'
 import { ReactNode, useCallback, useEffect, useState } from 'react'
@@ -13,10 +14,11 @@ import styled from 'styled-components/macro'
 
 import { ReactComponent as DropDown } from '../../assets/images/dropdown.svg'
 import useApproveCheck from '../../hooks/useApproveCheck'
+import useMatterAddress from '../../hooks/useMatterAddress'
 import useTheme from '../../hooks/useTheme'
 import { useActiveWeb3React } from '../../hooks/web3'
 import { useCurrencyBalance } from '../../state/wallet/hooks'
-import { ButtonGray } from '../Button'
+import { ButtonGray, ButtonPrimary } from '../Button'
 import ToolTipModal from '../merge/ToolTipModal'
 import { AutoRow } from '../Row'
 // import { Input as NumericalInput } from '../NumericalInput'
@@ -235,6 +237,17 @@ const StyledApproved = styled.div`
   background: ${({ theme }) => theme.bg1};
 `
 
+const StyledMergeButton = styled(ButtonPrimary)`
+  position: absolute;
+  bottom: 13px;
+  left: 16px;
+  font-size: 12px;
+  padding: 2px;
+  cursor: pointer;
+  border-radius: 6px;
+  width: auto;
+`
+
 const StyledOpenSeaWrapper = styled.div`
   position: absolute;
   top: 20px;
@@ -322,6 +335,59 @@ function ShowApprovStatus({ token }: { token: NFToken }) {
   return <StyledApproved onClick={approveToken}>{approveResult.result ? 'approved' : 'unapproved'}</StyledApproved>
 }
 
+function DemergeButton({ token, openDialog }: { token: NFToken; openDialog: (msg: string) => void }) {
+  // const result = useOwnerOf(yin?.tokenId)
+  // const approveResult = useApproveCheck(token?.tokenId, token?.contract)
+  // const updateTokenApproveCall = useUpdateApprovedStatus()
+
+  const [status, demergeCall] = useNFTDeMergeCallback(token)
+
+  const matterAddress = useMatterAddress()
+
+  const demergeHandle = useCallback(
+    (evt) => {
+      evt.stopPropagation()
+      if (!token || !token.approved || token.contract.toLowerCase() !== matterAddress.toLowerCase()) {
+        console.error('merge stopped', token)
+        return
+      }
+      // 调用授权
+      demergeCall()
+        .then(() => {
+          openDialog(
+            t`The token: #${token.tokenId} demerge request has been submitted, please wait patiently or refresh the page.`
+          )
+        })
+        .catch((err) => {
+          console.error(err)
+        })
+    },
+    [token, matterAddress, openDialog, demergeCall]
+  )
+
+  // useEffect(() => {
+  //   console.log(
+  //     '当前token:',
+  //     matterAddress.toLowerCase() === token.contract.toLowerCase(),
+  //     token.contract,
+  //     matterAddress,
+  //     token
+  //   )
+  // }, [token, matterAddress])
+
+  // useEffect(() => {
+  //   console.log('获取approve结果:', approveResult)
+  //   updateTokenApproveCall({
+  //     tokenId: token.tokenId,
+  //     status: approveResult.result,
+  //   })
+  // }, [token?.tokenId, approveResult.loading])
+
+  return token.contract.toLowerCase() === matterAddress.toLowerCase() && token.approved === true ? (
+    <StyledMergeButton onClick={demergeHandle}>demerge</StyledMergeButton>
+  ) : null
+}
+
 export default function NFTListPanel({
   value,
   onUserInput,
@@ -364,6 +430,14 @@ export default function NFTListPanel({
   const handleDismissTip = useCallback(() => {
     setModalOpen(false)
   }, [setModalOpen])
+
+  const handleOpenDialog = useCallback(
+    (msg) => {
+      setTipContent(msg)
+      setModalOpen(true)
+    },
+    [setModalOpen, setTipContent]
+  )
 
   const handleNFTSelect = useCallback(
     (token: NFToken) => {
@@ -409,6 +483,7 @@ export default function NFTListPanel({
                 <SelectRow style={{ borderRadius: '8px' }} selected={!onCurrencySelect}>
                   <NFTView width="100%" height="auto" src={token.tokenURI}></NFTView>
                   {token ? <ShowApprovStatus token={token} /> : null}
+                  {token ? <DemergeButton token={token} openDialog={handleOpenDialog} /> : null}
                 </SelectRow>
                 <StyledMask
                   Yin={token.contract === yin?.contract && token.tokenId === yin?.tokenId}

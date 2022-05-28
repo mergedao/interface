@@ -80,6 +80,13 @@ export const MERGE_ADDRESSES: AddressMap = {
   [SupportedChainId.RINKEBY]: '0xE181496cC2dcCCc2A8257F69ADF50490752E729c',
 }
 
+export const MATTER_ADDRESSES: AddressMap = {
+  [SupportedChainId.MAINNET]: '',
+  [SupportedChainId.ROPSTEN]: '',
+  [SupportedChainId.GOERLI]: '',
+  [SupportedChainId.RINKEBY]: '0x388b6c19FdB0959A2F5e4d88F462e563D1DD19ca',
+}
+
 export const SOCKS_CONTROLLER_ADDRESSES: AddressMap = {
   [SupportedChainId.MAINNET]: '0x65770b5283117639760beA3F867b69b3697a91dd',
 }

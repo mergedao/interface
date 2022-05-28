@@ -6,10 +6,11 @@ import { useAppDispatch } from 'state/hooks'
 import { getNetworkLibrary } from '../connectors'
 import { fetchTokenList } from '../state/lists/actions'
 import { fetchNFTokenList, Field } from '../state/merge/actions'
-import { NFTokenList } from '../state/merge/reducer'
+import { NFToken, NFTokenList } from '../state/merge/reducer'
 import getNFTokenList from '../utils/getNFTokenList'
 import getTokenList from '../utils/getTokenList'
 import resolveENSContentHash from '../utils/resolveENSContentHash'
+import useMatterAddress from './useMatterAddress'
 import { useActiveWeb3React } from './web3'
 
 export function useFetchListCallback(): (listUrl: string, sendDispatch?: boolean) => Promise<TokenList> {
@@ -58,6 +59,7 @@ export function useFetchNFTListCallback(): (
 ) => Promise<NFTokenList> {
   // const { chainId, library } = useActiveWeb3React()
   const dispatch = useAppDispatch()
+  const mattterAddress = useMatterAddress()
 
   // const ensResolver = useCallback(
   //   async (ensName: string) => {
@@ -83,8 +85,22 @@ export function useFetchNFTListCallback(): (
         .then((tokenList) => {
           // nftoken list, 需要重新格式化
           console.log('从opensea 获取nft 列表', tokenList)
-          sendDispatch && dispatch(fetchNFTokenList.fulfilled({ field, url: nftUrl, tokenList, requestId }))
-          return tokenList
+          const finalTokens: NFToken[] = tokenList.tokens.map((token) => {
+            return {
+              ...token,
+              isMatter: token.contract.toLowerCase() === mattterAddress.toLowerCase(),
+            } as NFToken
+          })
+          // console.log('格式化后的nft 列表', finalTokens, mattterAddress)
+
+          const finalTokenList = {
+            ...tokenList,
+            tokens: finalTokens,
+          }
+          // tokenList.tokens = finalTokens
+          sendDispatch &&
+            dispatch(fetchNFTokenList.fulfilled({ field, url: nftUrl, tokenList: finalTokenList, requestId }))
+          return finalTokenList
         })
         .catch((error) => {
           console.debug(`Failed to get list at url ${nftUrl}`, error)

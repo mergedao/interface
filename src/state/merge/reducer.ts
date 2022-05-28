@@ -27,6 +27,7 @@ export interface NFToken {
   readonly contractName: string
   readonly approved?: boolean // 是否授权了
   readonly openseaUrl?: string
+  readonly isMatter: boolean
   // readonly byUrl: {
   //   readonly [url: string]: {
   //     readonly current: TokenList | null
