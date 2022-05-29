@@ -261,7 +261,7 @@ export default function Menu() {
                       </div>
                       <Coffee opacity={0.6} size={16} />
                     </MenuItem> */}
-                    <MenuItem href="https://discord.gg/Rjn8z7Ykeb">
+                    <MenuItem href="https://discord.gg/PMQsgaBwMX">
                       <div>
                         <Trans>Discord</Trans>
                       </div>
