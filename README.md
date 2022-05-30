@@ -1,6 +1,6 @@
 # Merge Interface
 
-
+An open source interface for Matter interface 
 
 ## Contract address
 
