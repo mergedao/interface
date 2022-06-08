@@ -65,7 +65,7 @@ const NFTFixedContainer = styled.div<{ top?: string }>`
   top: ${({ top }) => top || '0'};
 `
 
-const Container = styled.div<{ hideInput: boolean }>`
+const Container = styled.div<{ hideInput: boolean; approved: boolean | undefined }>`
   border-radius: ${({ hideInput }) => (hideInput ? '16px' : '20px')};
   border: 1px solid ${({ theme, hideInput }) => (hideInput ? ' transparent' : theme.bg2)};
   background-color: ${({ theme }) => theme.bg1};
@@ -79,6 +79,7 @@ const Container = styled.div<{ hideInput: boolean }>`
   overflow: hidden;
   margin: 1rem;
   position: relative;
+  cursor: ${({ approved }) => (approved ? 'pointer' : 'auto')};
   box-shadow: 0px 8px 20px ${({ theme }) => theme.text4};
   :focus,
   :hover {
@@ -231,10 +232,20 @@ const StyledApproved = styled.div`
   right: 16px;
   font-size: 12px;
   padding: 2px;
-  cursor: pointer;
   border-radius: 6px;
   border: 1px solid ${({ theme }) => theme.text5};
   background: ${({ theme }) => theme.bg1};
+`
+
+const StyledApproveButton = styled(ButtonPrimary)`
+  position: absolute;
+  bottom: 13px;
+  right: 16px;
+  font-size: 12px;
+  padding: 2px;
+  cursor: pointer;
+  border-radius: 6px;
+  width: auto;
 `
 
 const StyledMergeButton = styled(ButtonPrimary)`
@@ -332,7 +343,15 @@ function ShowApprovStatus({ token }: { token: NFToken }) {
     })
   }, [token?.tokenId, approveResult.loading])
 
-  return <StyledApproved onClick={approveToken}>{approveResult.result ? 'approved' : 'unapproved'}</StyledApproved>
+  return (
+    <>
+      {!approveResult.result ? (
+        <StyledApproveButton onClick={approveToken}>unapproved</StyledApproveButton>
+      ) : (
+        <StyledApproved>approved</StyledApproved>
+      )}
+    </>
+  )
 }
 
 function DemergeButton({ token, openDialog }: { token: NFToken; openDialog: (msg: string) => void }) {
@@ -465,6 +484,7 @@ export default function NFTListPanel({
                 }}
                 key={token.tokenId + idx}
                 hideInput={hideInput}
+                approved={token.approved}
               >
                 {token.openseaUrl && (
                   <StyledOpenSeaWrapper>
